@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class Player : MovingObject {
 
-
-    const float STEEP = 0.5f;
-
     const int ANIM_IDLE = 0;
     const int ANIM_WALK_FRONT = 1;
     const int ANIM_WALK_RIGHT = 2;
@@ -36,7 +33,7 @@ public class Player : MovingObject {
 
         HandleAnimation(horizontal, vertical);
         if (horizontal != 0 || vertical != 0) {
-            AttemptMove<Wall>(horizontal, vertical);
+            AttemptMove(horizontal, vertical);
         }
 	}
 
@@ -55,17 +52,4 @@ public class Player : MovingObject {
             Debug.Log("error in HandleAnimation : InvalidValue");
         }
     }
-
-    protected override void AttemptMove<T>(int xDir, int yDir) {
-        RaycastHit2D hit1;
-        RaycastHit2D hit2;
-        if (Move(xDir, yDir, out hit1, out hit2)) {
-            //Debug.Log("i moved");
-        }
-    }
-
-    protected override void OnCantMove<T>(T component) {
-        Debug.Log("I'm blocked !");
-    }
-    
 }
