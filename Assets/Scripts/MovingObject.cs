@@ -52,6 +52,25 @@ public abstract class MovingObject : MonoBehaviour {
         RaycastHit2D hit1;
         RaycastHit2D hit2;
         RaycastHit2D hit3;
-        Move(xDir, yDir, out hit1, out hit2, out hit3);
+        bool canMove = Move(xDir, yDir, out hit1, out hit2, out hit3);
+        
+        if (hit1.transform == null && hit2.transform == null && hit3.transform == null)
+            return;
+
+        //Get a component reference to the component of type T attached to the object that was hit
+        Transform hitTransform = hit1.transform;
+        if(hitTransform == null) {
+            hitTransform = hit2.transform;
+        }
+        if (hitTransform == null) {
+            hitTransform = hit3.transform;
+        }
+         //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
+        if (!canMove && hitTransform != null)
+         OnCantMove(hitTransform.gameObject);
     }
+
+    //The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.
+    //OnCantMove will be overriden by functions in the inheriting classes.
+    protected abstract void OnCantMove(GameObject gameObject);
 }

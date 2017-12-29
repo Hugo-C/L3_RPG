@@ -52,4 +52,8 @@ public class Player : MovingObject {
             Debug.Log("error in HandleAnimation : InvalidValue");
         }
     }
+
+    protected override void OnCantMove(GameObject gameObject) {
+        Debug.Log("i can't move, i hit : " + gameObject.name);
+    }
 }
