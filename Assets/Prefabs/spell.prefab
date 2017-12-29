@@ -118,7 +118,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveTime: 0
-  moveCoef: 0
   blockingLayer:
     serializedVersion: 2
     m_Bits: 256

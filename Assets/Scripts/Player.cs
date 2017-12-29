@@ -10,6 +10,7 @@ public class Player : MovingObject {
     const int ANIM_WALK_RIGHT = 2;
     const int ANIM_WALK_BACK = 3;
     const int ANIM_WALK_LEFT = 4;
+    const float MOVE_COEF = 0.1f;
 
     private Animator animator;
 
@@ -21,11 +22,11 @@ public class Player : MovingObject {
 	
 	// Update is called once per frame
 	void Update () {
-        int horizontal = 0;
-        int vertical = 0;
+        float horizontal = 0;
+        float vertical = 0;
 
-        horizontal = (int) (Input.GetAxisRaw("Horizontal"));
-        vertical = (int) (Input.GetAxisRaw("Vertical"));
+        horizontal = Input.GetAxisRaw("Horizontal") * MOVE_COEF;
+        vertical = Input.GetAxisRaw("Vertical") * MOVE_COEF;
 
         if (horizontal != 0) {
             vertical = 0;  // the player can't move diagnoly (for now at least)
@@ -37,7 +38,7 @@ public class Player : MovingObject {
         }
 	}
 
-    private void HandleAnimation(int horizontal, int vertical) {
+    private void HandleAnimation(float horizontal, float vertical) {
         if (vertical == 0 && horizontal == 0) {
             animator.SetInteger("walk", ANIM_IDLE); // we don't have yet an idle animation
         } else if (vertical > 0) {

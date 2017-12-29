@@ -5,7 +5,6 @@ using UnityEngine;
 public abstract class MovingObject : MonoBehaviour {
 
     public float moveTime;
-    public float moveCoef;
     public LayerMask blockingLayer;
 
     private BoxCollider2D boxCollider;
@@ -16,18 +15,14 @@ public abstract class MovingObject : MonoBehaviour {
     // Use this for initialization
     protected virtual void Start () {
         moveTime = 0.1f;
-        moveCoef = 0.1f;
         boxCollider = GetComponent<BoxCollider2D>();
         rb2D = GetComponent<Rigidbody2D>();
         inverseMoveTime = 1f / moveTime;
 	}
 
-    protected bool Move(int xDir, int yDir, out RaycastHit2D hit1, out RaycastHit2D hit2, out RaycastHit2D hit3) {
+    protected bool Move(float xDir, float yDir, out RaycastHit2D hit1, out RaycastHit2D hit2, out RaycastHit2D hit3) {
         Vector2 start = transform.position;
-        
-        float x = xDir * moveCoef;
-        float y = yDir * moveCoef;
-        Vector2 end = start + new Vector2(x, y);
+        Vector2 end = start + new Vector2(xDir, yDir);
 
         boxCollider.enabled = false;  // we don't want to hit our own boxCollider
         hit1 = Physics2D.Linecast(start + shift, end + shift, blockingLayer);  // first hit a bit above
@@ -48,7 +43,7 @@ public abstract class MovingObject : MonoBehaviour {
     }
 
 
-    protected void AttemptMove(int xDir, int yDir) {
+    protected void AttemptMove(float xDir, float yDir) {
         RaycastHit2D hit1;
         RaycastHit2D hit2;
         RaycastHit2D hit3;

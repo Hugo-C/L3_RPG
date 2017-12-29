@@ -1,15 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Spell : MovingObject {
 
+    const float MOVE_COEF = 0.1f;  // use to slow down the mouvement speed
     Animator animator;
     bool fading;
+    float horizontal;
+    float vertical;
+
 
     protected override void Start() {
         animator = gameObject.GetComponent<Animator>();
         fading = false;
+        horizontal = (float)Math.Cos((double)((gameObject.transform.rotation.eulerAngles.z - 90f) * Math.PI / 180));  // we need to add 90 since the default spell look down
+        vertical = (float)Math.Sin((double)((gameObject.transform.rotation.eulerAngles.z - 90f) * Math.PI / 180));
+        horizontal *= MOVE_COEF; 
+        vertical *= MOVE_COEF; 
         base.Start();
     }
 
@@ -22,7 +31,7 @@ public class Spell : MovingObject {
     // Update is called once per frame
     void Update () {
         if (!fading) {
-            AttemptMove(0, -1);
+            AttemptMove(horizontal, vertical);
         }
 	}
 }
