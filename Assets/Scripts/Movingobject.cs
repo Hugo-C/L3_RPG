@@ -20,21 +20,69 @@ public abstract class MovingObject : MonoBehaviour {
         inverseMoveTime = 1f / moveTime;
 	}
 
-    protected bool Move(float xDir, float yDir, out RaycastHit2D hit1, out RaycastHit2D hit2, out RaycastHit2D hit3) {
+    protected bool Move(float xDir, float yDir, List<string> tags, out RaycastHit2D[] hits) {
         Vector2 start = transform.position;
         Vector2 end = start + new Vector2(xDir, yDir);
 
         boxCollider.enabled = false;  // we don't want to hit our own boxCollider
-        hit1 = Physics2D.Linecast(start + shift, end + shift, blockingLayer);  // first hit a bit above
-        hit2 = Physics2D.Linecast(start, end, blockingLayer);  // second hit in the middle
-        hit3 = Physics2D.Linecast(start - shift, end - shift, blockingLayer);  // third hit a bit under
+        hits = Physics2D.LinecastAll(start + shift, end + shift, blockingLayer);  // first hit a bit above
+        // it's way more efficient to concat than to merge the element even if it's mean some elements are duplicates
+        hits = Concat(hits, Physics2D.LinecastAll(start, end, blockingLayer));  // second hit in the middle
+        hits = Concat(hits, Physics2D.LinecastAll(start - shift, end - shift, blockingLayer));  // third hit a bit under
         boxCollider.enabled = true;
-        if(hit1.transform == null && hit2.transform == null) {
-            gameObject.transform.position = end;
-            SmoothMovement(end);
-            return true;
+        foreach (RaycastHit2D hit in hits) {
+            if ((hit.transform != null) && (tags.Contains(hit.transform.gameObject.tag))) {
+                return false;
+            }
         }
-        return false;
+        // if there is no element to block the mouvement, we can proceed
+        SmoothMovement(end);
+        return true;
+    }
+
+    RaycastHit2D[] Concat(RaycastHit2D[] array1, RaycastHit2D[] array2) {
+        RaycastHit2D[] res = new RaycastHit2D[array1.Length + array2.Length];
+        for (int i = 0; i < array1.Length; i++) {
+            res[i] = array1[i];
+        }
+        for (int j = 0; j < array2.Length; j++) {
+            res[array1.Length + j] = array2[j];  // we add our element after elements of array1 
+        }
+        return res;
+    }
+
+    RaycastHit2D[] Merge(RaycastHit2D[] array1, RaycastHit2D[] array2) {
+        int nbrElementInBothArray = 0;
+        for(int i = 0; i < array1.Length; i++) {
+            for(int j = 0; j < array2.Length; j++) {
+                if (array1[i].Equals(array2[j])) {
+                    nbrElementInBothArray++;
+                }
+            }
+        }
+        bool isPresentInBothArray;
+        RaycastHit2D[] res = new RaycastHit2D[array1.Length + array2.Length - nbrElementInBothArray];
+        int index = 0;
+        for (int i = 0; i < array1.Length; i++) {
+            isPresentInBothArray = false;
+            for (int j = 0; j < array2.Length; j++) {
+                if (array1[i].Equals(array2[j])) {
+                    isPresentInBothArray = true;
+                }
+            }
+            if (!isPresentInBothArray) {  // we add element present only in the first array
+                res[index] = array1[i];
+                index++;
+            }
+        }
+        for (int i = 0; i < array2.Length; i++) {  // we add all the element of array2
+            res[index] = array2[i];
+            index++;
+        }
+        if(index != res.Length) {
+            Debug.Log("error with the merging of RaycastHit2D[]");
+        }
+        return res;
     }
 
     protected void SmoothMovement(Vector3 end) {
@@ -43,26 +91,29 @@ public abstract class MovingObject : MonoBehaviour {
     }
 
 
-    protected void AttemptMove(float xDir, float yDir) {
-        RaycastHit2D hit1;
-        RaycastHit2D hit2;
-        RaycastHit2D hit3;
-        bool canMove = Move(xDir, yDir, out hit1, out hit2, out hit3);
-        
-        if (hit1.transform == null && hit2.transform == null && hit3.transform == null)
+    protected void AttemptMove(float xDir, float yDir,List<string> tags) {
+        RaycastHit2D[] hits;
+        bool canMove = Move(xDir, yDir, tags, out hits);
+        if (canMove)  // no need to continue
             return;
 
         //Get a component reference to the component of type T attached to the object that was hit
-        Transform hitTransform = hit1.transform;
-        if(hitTransform == null) {
-            hitTransform = hit2.transform;
+        int i = 0;
+        Transform hitTransform = hits[i].transform;
+        i++;
+        while(hitTransform == null && !tags.Contains(hitTransform.tag) && i < hits.Length) {
+            Debug.Log(hitTransform.gameObject.name);
+            hitTransform = hits[i].transform;
+            i++;
         }
-        if (hitTransform == null) {
-            hitTransform = hit3.transform;
+        Debug.Log(hitTransform.gameObject.name);
+        //If canMove is false and hitComponent is of a tag blocking the mouvement, meaning MovingObject is blocked and has hit something it can interact with.
+        if (tags.Contains(hitTransform.tag)) {
+            OnCantMove(hitTransform.gameObject);
+        } else {
+            Debug.Log("the object wasn't able to move, but no object block his way");  // FIXME -> HERE IS THE PROBLEM
+            OnCantMove(null);
         }
-         //If canMove is false and hitComponent is not equal to null, meaning MovingObject is blocked and has hit something it can interact with.
-        if (!canMove && hitTransform != null)
-         OnCantMove(hitTransform.gameObject);
     }
 
     //The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.

@@ -151,13 +151,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
-    - target: {fileID: 1632549746146930, guid: 1dbcce1b393f4d444b9040a68307f8df, type: 2}
-      propertyPath: m_Layer
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 4251782477324704, guid: 1dbcce1b393f4d444b9040a68307f8df, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 70
+    - target: {fileID: 114658482082165862, guid: 1dbcce1b393f4d444b9040a68307f8df,
+        type: 2}
+      propertyPath: moveTime
+      value: 0.1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 1dbcce1b393f4d444b9040a68307f8df, type: 2}
@@ -277,29 +274,6 @@ Prefab:
     - target: {fileID: 4908685386006336, guid: f1ae10028ec1edf41aa89febe7737c3b, type: 2}
       propertyPath: m_RootOrder
       value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 50837104210886584, guid: f1ae10028ec1edf41aa89febe7737c3b,
-        type: 2}
-      propertyPath: m_CollisionDetection
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 50837104210886584, guid: f1ae10028ec1edf41aa89febe7737c3b,
-        type: 2}
-      propertyPath: m_Simulated
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 50837104210886584, guid: f1ae10028ec1edf41aa89febe7737c3b,
-        type: 2}
-      propertyPath: m_UseFullKinematicContacts
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908685386006336, guid: f1ae10028ec1edf41aa89febe7737c3b, type: 2}
-      propertyPath: m_LocalScale.x
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4908685386006336, guid: f1ae10028ec1edf41aa89febe7737c3b, type: 2}
-      propertyPath: m_LocalScale.y
-      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: f1ae10028ec1edf41aa89febe7737c3b, type: 2}
