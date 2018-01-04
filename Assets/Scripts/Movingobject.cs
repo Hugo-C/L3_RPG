@@ -26,9 +26,8 @@ public abstract class MovingObject : MonoBehaviour {
 
         boxCollider.enabled = false;  // we don't want to hit our own boxCollider
         hits = Physics2D.LinecastAll(start + shift, end + shift, blockingLayer);  // first hit a bit above
-        // it's way more efficient to concat than to merge the element even if it's mean some elements are duplicates
-        hits = Concat(hits, Physics2D.LinecastAll(start, end, blockingLayer));  // second hit in the middle
-        hits = Concat(hits, Physics2D.LinecastAll(start - shift, end - shift, blockingLayer));  // third hit a bit under
+        hits = Merge(hits, Physics2D.LinecastAll(start, end, blockingLayer));  // second hit in the middle
+        hits = Merge(hits, Physics2D.LinecastAll(start - shift, end - shift, blockingLayer));  // third hit a bit under
         boxCollider.enabled = true;
         foreach (RaycastHit2D hit in hits) {
             if ((hit.transform != null) && (tags.Contains(hit.transform.gameObject.tag))) {
@@ -101,17 +100,15 @@ public abstract class MovingObject : MonoBehaviour {
         int i = 0;
         Transform hitTransform = hits[i].transform;
         i++;
-        while(hitTransform == null && !tags.Contains(hitTransform.tag) && i < hits.Length) {
-            Debug.Log(hitTransform.gameObject.name);
+        while(hitTransform != null && !tags.Contains(hitTransform.tag) && i < hits.Length) {
             hitTransform = hits[i].transform;
             i++;
         }
-        Debug.Log(hitTransform.gameObject.name);
         //If canMove is false and hitComponent is of a tag blocking the mouvement, meaning MovingObject is blocked and has hit something it can interact with.
         if (tags.Contains(hitTransform.tag)) {
             OnCantMove(hitTransform.gameObject);
         } else {
-            Debug.Log("the object wasn't able to move, but no object block his way");  // FIXME -> HERE IS THE PROBLEM
+            Debug.Log("the object wasn't able to move, but no object block his way : " + hitTransform.gameObject.name);
             OnCantMove(null);
         }
     }

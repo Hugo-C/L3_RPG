@@ -14,7 +14,7 @@ public class Player : MovingObject {
     const float SPELL_COOLDOWN = 0.5f;
 
     private Animator animator;
-    List<string> collidingTag;
+    List<string> collidingTag;  // tag the player can collide with
 
     public GameObject spell;
     private bool castOnCoolDown;  // use to limit the number of cast per minute
@@ -68,7 +68,6 @@ public class Player : MovingObject {
     }
 
     private IEnumerator CastSpell(float horizontalFire, float verticalFire) {
-        Debug.Log("hf : " + horizontalFire + " vf : " + verticalFire);
         castOnCoolDown = true;
         float z;
         z = (float)(Math.Acos((double) (horizontalFire)) * 180 / Math.PI);
@@ -83,7 +82,7 @@ public class Player : MovingObject {
 
     protected override void OnCantMove(GameObject gameObject) {
         if (gameObject != null) {
-            Debug.Log("i can't move, i hit : " + gameObject.name);
+            //Debug.Log("i can't move, i hit : " + gameObject.name);
         }
     }
 }

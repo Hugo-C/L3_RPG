@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Spell
   - BlockingBg
+  - Ennemy
   layers:
   - Default
   - TransparentFX
