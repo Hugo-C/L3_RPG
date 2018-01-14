@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Ennemy : MovingObject {
 
-    const float MOVE_COEF = 0.005f;
+    const float MOVE_COEF = 0.0075f;
 
     private GameObject player;
     private int life;
@@ -42,7 +42,10 @@ public class Ennemy : MovingObject {
 
 
     protected override void OnCantMove(GameObject gameObject) {
-        throw new System.NotImplementedException();
+        if(gameObject != null && gameObject.tag == "Player") {
+            Player player = gameObject.GetComponent<Player>();
+            player.Hit();
+        }
     }
 
     public void Hit() {

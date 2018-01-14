@@ -12,18 +12,35 @@ public class Player : MovingObject {
     const int ANIM_WALK_LEFT = 4;
     const float MOVE_COEF = 0.1f;
     const float SPELL_COOLDOWN = 0.5f;
+    const float INVUNERABLE_TIME = 1f;
 
     private Animator animator;
     List<string> collidingTag;  // tag the player can collide with
 
     public GameObject spell;
+    public GameObject heart;
     private bool castOnCoolDown;  // use to limit the number of cast per minute
+    private bool invulnerable;  // use to limit the number of hit taken per minute
+    private int _life;
+
+    public int Life {
+        get {
+            return _life;
+        }
+
+        set {
+            _life = value;
+            DisplayLife(_life);
+        }
+    }
 
     // Use this for initialization
     protected override void Start () {
-        castOnCoolDown = false;
         animator = gameObject.GetComponent<Animator>();
         collidingTag = new List<string> { "BlockingBg" };
+        castOnCoolDown = false;
+        invulnerable = false;
+        Life = 3;
         base.Start();
     }
 	
@@ -83,6 +100,41 @@ public class Player : MovingObject {
     protected override void OnCantMove(GameObject gameObject) {
         if (gameObject != null) {
             //Debug.Log("i can't move, i hit : " + gameObject.name);
+        }
+    }
+
+    public void Hit() {
+        StartCoroutine(MyHit());
+    }
+
+    private IEnumerator MyHit() {
+        if (!invulnerable) {
+            invulnerable = true;
+            Life--;
+            if(Life == 0) {
+                LevelManager levelManager = LevelManager.instance;
+                levelManager.LoadScene("endGame");
+            }
+            yield return new WaitForSeconds(INVUNERABLE_TIME);
+            invulnerable = false;
+        }
+    }
+
+    public void DisplayLife(int lifeToDisplay) {
+        RemoveLife(); // barbaric suppression
+        //GameObject.Finds("Heart (clone)");
+        Vector3 original = new Vector3(-0.35f, 1f) + gameObject.transform.position;
+        for(int i=0; i < lifeToDisplay; i++) {
+            Vector3 shift = new Vector3(0.35f*i, 0f);
+            GameObject go = Instantiate(heart, original + shift , Quaternion.identity);
+            //go.transform.parent = gameObject.transform;
+            go.transform.SetParent(gameObject.transform);
+        }
+    }
+
+    public void RemoveLife() {
+        foreach (Transform child in transform) {
+            Destroy(child.gameObject);
         }
     }
 }

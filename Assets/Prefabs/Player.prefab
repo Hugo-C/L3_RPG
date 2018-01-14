@@ -122,6 +122,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   spell: {fileID: 1632549746146930, guid: 1dbcce1b393f4d444b9040a68307f8df, type: 2}
+  heart: {fileID: 1709331395677186, guid: 1cd35b4db6c4ffe47a8557ece747229a, type: 2}
 --- !u!212 &212348973530512054
 SpriteRenderer:
   m_ObjectHideFlags: 1
