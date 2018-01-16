@@ -3,14 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spell : MovingObject {
+public abstract class Spell : MovingObject {
 
     const float MOVE_COEF = 0.15f;  // use to slow down the mouvement speed
-    Animator animator;
-    bool cantMove;
+    protected Animator animator;
+    protected bool cantMove;
     float horizontal;
     float vertical;
-    List<string> collidingTag;
+    protected List<string> collidingTag;
 
 
     protected override void Start() {
@@ -30,13 +30,5 @@ public class Spell : MovingObject {
             AttemptMove(horizontal, vertical, collidingTag);
         }
     }
-    protected override void OnCantMove(GameObject go) {
-        animator.SetTrigger("end");
-        if(go != null && go.tag == "Ennemy") {
-            Ennemy ennemy = go.GetComponent<Ennemy>();
-            ennemy.Hit();
-        }
-        Destroy(gameObject, animator.GetCurrentAnimatorStateInfo(0).length);  // destroy the spell once the animation is complete
-        cantMove = true;
-    }
+    protected override abstract void OnCantMove(GameObject go);
 }
