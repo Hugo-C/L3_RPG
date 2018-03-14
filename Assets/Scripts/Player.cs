@@ -66,6 +66,11 @@ public class Player : MovingObject {
         if ((horizontalFire != 0 || verticalFire != 0) && !castOnCoolDown) {
             StartCoroutine(CastSpell(horizontalFire, verticalFire));
         }
+
+        if (Input.GetKeyDown(KeyCode.Space)) {
+            Debug.Log("je cast une spirale");
+            CastSpiralSpell();
+        }
     }
 
     private void HandleAnimation(float horizontal, float vertical) {
@@ -81,6 +86,18 @@ public class Player : MovingObject {
             animator.SetInteger("walk", ANIM_WALK_LEFT);
         } else {
             Debug.Log("error in HandleAnimation : InvalidValue");
+        }
+    }
+
+    // Cast spell in all directions
+    private void CastSpiralSpell() {
+        int cpt = 0;
+        for(float i = -0.5f; i <= 0.5f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
+            for(float j = -0.5f; j <= 0.5f; j += UnityEngine.Random.Range(0.25f, 0.5f)) {
+                cpt++;
+                Debug.Log("cpt de spell : " + cpt + " i : " + i + " j : " + j);
+                StartCoroutine(CastSpell(i, j));
+            }
         }
     }
 
@@ -104,7 +121,7 @@ public class Player : MovingObject {
     }
 
     public void Hit() {
-        StartCoroutine(MyHit());
+        //StartCoroutine(MyHit());
     }
 
     private IEnumerator MyHit() {
