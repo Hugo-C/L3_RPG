@@ -104,7 +104,8 @@ public abstract class MovingObject : MonoBehaviour {
             hitTransform = hits[i].transform;
             i++;
         }
-        //If canMove is false and hitComponent is of a tag blocking the mouvement, meaning MovingObject is blocked and has hit something it can interact with.
+        //If canMove is false and hitComponent is of a tag blocking the mouvement, 
+        //meaning MovingObject is blocked and has hit something it can interact with.
         if (tags.Contains(hitTransform.tag)) {
             OnCantMove(hitTransform.gameObject);
         } else {
@@ -116,4 +117,8 @@ public abstract class MovingObject : MonoBehaviour {
     //The abstract modifier indicates that the thing being modified has a missing or incomplete implementation.
     //OnCantMove will be overriden by functions in the inheriting classes.
     protected abstract void OnCantMove(GameObject gameObject);
+
+    public void pathFinding(int x, int y, int x2, int y2){
+
+    }
 }

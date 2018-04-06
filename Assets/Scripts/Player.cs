@@ -91,13 +91,10 @@ public class Player : MovingObject {
 
     // Cast spell in all directions
     private void CastSpiralSpell() {
-        int cpt = 0;
-        for(float i = -0.5f; i <= 0.5f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
-            for(float j = -0.5f; j <= 0.5f; j += UnityEngine.Random.Range(0.25f, 0.5f)) {
-                cpt++;
-                Debug.Log("cpt de spell : " + cpt + " i : " + i + " j : " + j);
-                StartCoroutine(CastSpell(i, j));
-            }
+        for(float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
+            // we fire in both direction (up and down)
+            StartCoroutine(CastSpell(i, -1));
+            StartCoroutine(CastSpell(i, 1));
         }
     }
 
