@@ -118,7 +118,7 @@ public class Player : MovingObject {
     }
 
     public void Hit() {
-        //StartCoroutine(MyHit());
+        StartCoroutine(MyHit());
     }
 
     private IEnumerator MyHit() {
@@ -141,7 +141,7 @@ public class Player : MovingObject {
         for(int i=0; i < lifeToDisplay; i++) {
             Vector3 shift = new Vector3(0.35f*i, 0f);
             GameObject go = Instantiate(heart, original + shift , Quaternion.identity);
-            //go.transform.parent = gameObject.transform;
+            go.transform.position = original + shift;
             go.transform.SetParent(gameObject.transform);
         }
     }
