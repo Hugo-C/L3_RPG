@@ -12,6 +12,7 @@ public class Player : MovingObject {
     const int ANIM_WALK_LEFT = 4;
     const float MOVE_COEF = 0.1f;
     const float SPELL_COOLDOWN = 0.5f;
+    const float SPIRAL_SPELL_COOLDOWN = 1f;
     const float INVUNERABLE_TIME = 1f;
 
     private Animator animator;
@@ -19,7 +20,8 @@ public class Player : MovingObject {
 
     public GameObject spell;
     public GameObject heart;
-    private bool castOnCoolDown;  // use to limit the number of cast per minute
+    private bool spellOnCoolDown;  // use to limit the number of cast per minute
+    private bool spiralSpellOnCoolDown;
     private bool invulnerable;  // use to limit the number of hit taken per minute
     private int _life;
 
@@ -38,7 +40,7 @@ public class Player : MovingObject {
     protected override void Start () {
         animator = gameObject.GetComponent<Animator>();
         collidingTag = new List<string> { "BlockingBg" };
-        castOnCoolDown = false;
+        spellOnCoolDown = false;
         invulnerable = false;
         Life = 3;
         base.Start();
@@ -63,13 +65,13 @@ public class Player : MovingObject {
 
         horizontalFire = Input.GetAxisRaw("HorizontalFire");
         verticalFire = Input.GetAxisRaw("VerticalFire");
-        if ((horizontalFire != 0 || verticalFire != 0) && !castOnCoolDown) {
-            StartCoroutine(CastSpell(horizontalFire, verticalFire));
+        if ((horizontalFire != 0 || verticalFire != 0) && !spellOnCoolDown) {
+            StartCoroutine(CastSpell(horizontalFire, verticalFire, true));
         }
 
-        if (Input.GetKeyDown(KeyCode.Space)) {
+        if (Input.GetKeyDown(KeyCode.Space) && !spiralSpellOnCoolDown) {
             Debug.Log("je cast une spirale");
-            CastSpiralSpell();
+            StartCoroutine(CastSpiralSpell());
         }
     }
 
@@ -90,16 +92,26 @@ public class Player : MovingObject {
     }
 
     // Cast spell in all directions
-    private void CastSpiralSpell() {
-        for(float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
+    private IEnumerator CastSpiralSpell() {
+        spiralSpellOnCoolDown = true;
+        for (float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
             // we fire in both direction (up and down)
-            StartCoroutine(CastSpell(i, -1));
-            StartCoroutine(CastSpell(i, 1));
+            StartCoroutine(CastSpell(i, -1, false));
+            StartCoroutine(CastSpell(i, 1, false));
         }
+        yield return new WaitForSeconds(SPELL_COOLDOWN);
+        spiralSpellOnCoolDown = false;
     }
 
-    private IEnumerator CastSpell(float horizontalFire, float verticalFire) {
-        castOnCoolDown = true;
+    /**
+     * Cast a single spell
+     * horizontalFire and verticalFire indicate the orientation
+     * the cooldown is handled if castedByPlayer is true   
+     */
+    private IEnumerator CastSpell(float horizontalFire, float verticalFire, bool castedByPlayer) {
+        if (castedByPlayer) {
+            spellOnCoolDown = true;
+        }
         float z;
         z = (float)(Math.Acos((double) (horizontalFire)) * 180 / Math.PI);
         if ((float)(Math.Asin((double)(verticalFire)) * 180 / Math.PI) > 0) {
@@ -108,7 +120,9 @@ public class Player : MovingObject {
         Vector3 v = new Vector3(0f, 0f, z + 90f);
         Instantiate(spell, gameObject.transform.position, Quaternion.Euler(v));
         yield return new WaitForSeconds(SPELL_COOLDOWN);
-        castOnCoolDown = false;
+        if(castedByPlayer) {
+            spellOnCoolDown = false;
+        }
     }
 
     protected override void OnCantMove(GameObject gameObject) {
