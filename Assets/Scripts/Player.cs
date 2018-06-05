@@ -95,9 +95,15 @@ public class Player : MovingObject {
     private IEnumerator CastSpiralSpell() {
         spiralSpellOnCoolDown = true;
         for (float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
+            Debug.Log("spell : " + i);
             // we fire in both direction (up and down)
-            StartCoroutine(CastSpell(i, -1, false));
-            StartCoroutine(CastSpell(i, 1, false));
+            if(i != -1f) {
+                StartCoroutine(CastSpell(i, -1f, false));
+                StartCoroutine(CastSpell(i, 1f, false));
+            } else {
+                StartCoroutine(CastSpell(i, -1f, false));
+                StartCoroutine(CastSpell(-i, 1f, false));
+            }
         }
         yield return new WaitForSeconds(SPELL_COOLDOWN);
         spiralSpellOnCoolDown = false;

@@ -21,7 +21,7 @@ public class BouncingSpell : Spell {
     }
 
     protected override void OnCantMove(GameObject go) {
-        animator.SetTrigger("end");
+        cantMove = true;
         if (go != null) {
             if (go.tag == "Ennemy") {
                 Ennemy ennemy = go.GetComponent<Ennemy>();
@@ -31,8 +31,6 @@ public class BouncingSpell : Spell {
                 player.Hit();
             }
         }
-
-        Destroy(gameObject, animator.GetCurrentAnimatorStateInfo(0).length);  // destroy the spell once the animation is complete
-        cantMove = true;
+        MyDestroy();
     }
 }

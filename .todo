@@ -1,15 +1,27 @@
 <?xml version="1.0"?>
 <todo version="0.1.20">
-    <note priority="high" time="1523143099">
+    <note priority="high" time="1523143099" done="1528213914">
         ajuster les hitbox des murs
     </note>
-    <note priority="low" time="1521027495">
+    <note priority="low" time="1521027495" done="1528214398">
         enlever les spells dupliqué de l'attaque en spiral
+        <comment>
+            le spell dupliqué (le plus à gauche) est traité dans un if
+        </comment>
     </note>
-    <note priority="low" time="1523139129">
+    <note priority="low" time="1523139129" done="1528214440">
         empecher de spammer le sort en spiral
     </note>
-    <note priority="verylow" time="1523143063">
+    <note priority="verylow" time="1523143063" done="1528215569">
         (re) supprimer les sorts qui partent trop loin
+        <comment>
+            ajout d'un if dans Update de Spell.cs
+        </comment>
+    </note>
+    <note priority="low" time="1528215636" done="1528216987">
+        supprimer la trace d'un sort ou augmenter sa transparence
+        <comment>
+            reduction par 2.5 (bidouille) du temps avant la destruction d us sort
+        </comment>
     </note>
 </todo>
