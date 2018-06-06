@@ -12,7 +12,7 @@ TextureImporter:
     21300014: background_7
     21300016: background_8
     21300018: background_9
-    21300020: background_10
+    21300020: wallWest
     21300022: background_11
     21300024: cornerUpperRight
     21300026: cornerUpperLeft
@@ -24,6 +24,7 @@ TextureImporter:
     21300038: background_16
     21300040: cornerBottomLeft
     21300042: wallSouth
+    21300044: wallEast
   externalObjects: {}
   serializedVersion: 5
   mipmaps:
@@ -284,7 +285,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: background_10
+      name: wallWest
       rect:
         serializedVersion: 2
         x: 320
@@ -539,6 +540,26 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: b59a1f46d4ba3a448a0cb4025bfe1927
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: wallEast
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 96
+        width: 28
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05e7eb530f1866645bb218192aa9bc1c
       vertices: []
       indices: 
       edges: []

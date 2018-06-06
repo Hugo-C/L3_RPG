@@ -20,9 +20,10 @@ public class Player : MovingObject {
 
     public GameObject spell;
     public GameObject heart;
+    public bool invulnerable;  // use to limit the number of hit taken per minute
+
     private bool spellOnCoolDown;  // use to limit the number of cast per minute
     private bool spiralSpellOnCoolDown;
-    private bool invulnerable;  // use to limit the number of hit taken per minute
     private int _life;
 
     public int Life {
@@ -41,7 +42,6 @@ public class Player : MovingObject {
         animator = gameObject.GetComponent<Animator>();
         collidingTag = new List<string> { "BlockingBg" };
         spellOnCoolDown = false;
-        invulnerable = false;
         Life = 3;
         base.Start();
     }
@@ -95,7 +95,6 @@ public class Player : MovingObject {
     private IEnumerator CastSpiralSpell() {
         spiralSpellOnCoolDown = true;
         for (float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
-            Debug.Log("spell : " + i);
             // we fire in both direction (up and down)
             if(i != -1f) {
                 StartCoroutine(CastSpell(i, -1f, false));

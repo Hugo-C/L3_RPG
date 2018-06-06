@@ -10,7 +10,9 @@ public class LevelManager : MonoBehaviour {
     public static LevelManager instance = null;  // singleton patern
     public GameObject floor;
     public GameObject northWall;
+    public GameObject eastWall;
     public GameObject southWall;
+    public GameObject westWall;
     public GameObject cornerUpperLeft;
     public GameObject cornerUpperRight;
     public GameObject cornerBottomRight;
@@ -60,13 +62,13 @@ public class LevelManager : MonoBehaviour {
         BoxCollider2D myNorthbc = myNorthWall.GetComponent<BoxCollider2D>();
         myNorthbc.size = new Vector2(floorWidth / 1.9f - myNorthbc.size.y, myNorthbc.size.y);
 
-        GameObject myEastWall = Instantiate(northWall, new Vector3((floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.Euler(0f, 0f, -90f));
+        GameObject myEastWall = Instantiate(eastWall, new Vector3((floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.identity);
         myEastWall.name = "myEastWall";
         SpriteRenderer srEastWall = myEastWall.GetComponent<SpriteRenderer>();
         srEastWall.drawMode = SpriteDrawMode.Tiled;
-        srEastWall.size = new Vector2(floorHeight / 1.9f - srEastWall.size.y, srEastWall.size.y);
+        srEastWall.size = new Vector2(srEastWall.size.y, floorHeight / 1.9f - srEastWall.size.y);
         BoxCollider2D myEasthbc = myEastWall.GetComponent<BoxCollider2D>();
-        myEasthbc.size = new Vector2(floorHeight / 1.9f - myEasthbc.size.y, myEasthbc.size.y);
+        myEasthbc.size = new Vector2(myEasthbc.size.y, floorHeight / 1.9f - myEasthbc.size.y);
 
         GameObject mySouthWall = Instantiate(southWall, new Vector3(0f, - (floorHeight + northWall.GetComponent<SpriteRenderer>().size.y) / 2), Quaternion.identity);
         mySouthWall.name = "mySouthWall";
@@ -76,13 +78,13 @@ public class LevelManager : MonoBehaviour {
         BoxCollider2D mySouthbc = mySouthWall.GetComponent<BoxCollider2D>();
         mySouthbc.size = new Vector2(floorWidth / 1.9f - mySouthbc.size.y, mySouthbc.size.y);
 
-        GameObject myWestWall = Instantiate(northWall, new Vector3(- (floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.Euler(0f, 0f, 90f));
+        GameObject myWestWall = Instantiate(westWall, new Vector3(- (floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.identity);
         myWestWall.name = "myWestWall";
         SpriteRenderer srWestWall = myWestWall.GetComponent<SpriteRenderer>();
         srWestWall.drawMode = SpriteDrawMode.Tiled;
-        srWestWall.size = new Vector2(floorHeight / 1.9f - srWestWall.size.y, srWestWall.size.y);
+        srWestWall.size = new Vector2(srWestWall.size.y, floorHeight / 1.9f - srWestWall.size.y);
         BoxCollider2D myWestbc = myWestWall.GetComponent<BoxCollider2D>();
-        myWestbc.size = new Vector2(floorHeight / 1.9f - myWestbc.size.y, myWestbc.size.y);
+        myWestbc.size = new Vector2(myWestbc.size.y, floorHeight / 1.9f - myWestbc.size.y);
 
         // add corners to walls
         Vector3 cornerUpperLeftPos = new Vector3(myWestWall.transform.position.x, myNorthWall.transform.position.y, -1);
