@@ -117,7 +117,7 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.5471698, g: 0.5187789, b: 0.5187789, a: 0.79607844}
   m_Intensity: 0.7
   m_Range: 5
   m_SpotAngle: 30
@@ -137,7 +137,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
@@ -161,7 +161,7 @@ MonoBehaviour:
     m_Bits: 256
   spell: {fileID: 1632549746146930, guid: 1dbcce1b393f4d444b9040a68307f8df, type: 2}
   heart: {fileID: 1709331395677186, guid: 1cd35b4db6c4ffe47a8557ece747229a, type: 2}
-  invulnerable: 0
+  invulnerable: 1
 --- !u!212 &212348973530512054
 SpriteRenderer:
   m_ObjectHideFlags: 1
