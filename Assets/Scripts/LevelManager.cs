@@ -9,19 +9,15 @@ public class LevelManager : MonoBehaviour {
     const int MAX_SIZE_ROOM = 20;
     public static LevelManager instance = null;  // singleton patern
     public GameObject floor;
-    public GameObject northWall;
-    public GameObject eastWall;
-    public GameObject southWall;
-    public GameObject westWall;
-    public GameObject cornerUpperLeft;
-    public GameObject cornerUpperRight;
-    public GameObject cornerBottomRight;
-    public GameObject cornerBottomLeft;
+    public GameObject wall;
+
+    private int[,] map;
 
     //Awake is always called before any Start functions
     void Awake() {
         if(SceneManager.GetActiveScene().name == "main") {
-            GenerateLevel();
+            map = GenerateArray(20, 20, true);
+            RenderMap(map);
         }
         //Check if instance already exists
         if (instance == null) {
@@ -44,61 +40,35 @@ public class LevelManager : MonoBehaviour {
         SceneManager.LoadScene(scene);
     }
 
-    public void GenerateLevel() {
-        // generate the floor
-        int floorHeight = Random.Range(MIN_SIZE_ROOM, MAX_SIZE_ROOM);
-        int floorWidth = Random.Range(MIN_SIZE_ROOM, MAX_SIZE_ROOM);
-        GameObject myFloor = Instantiate(floor, new Vector3(0f, 0f, 1f), Quaternion.identity);
-        SpriteRenderer srFloor = myFloor.GetComponent<SpriteRenderer>();
-        srFloor.drawMode = SpriteDrawMode.Sliced;
-        srFloor.size = new Vector2(floorWidth, floorHeight);
+    public static int[,] GenerateArray(int width, int height, bool empty) {
+        int[,] map = new int[width, height];
+        for (int x = 0; x < map.GetUpperBound(0); x++) {
+            for (int y = 0; y < map.GetUpperBound(1); y++) {
+                if (x == 0 || x == map.GetUpperBound(0) - 1 || y == 0 || y == map.GetUpperBound(1) - 1) {
+                    map[x, y] = 1;
+                } else if (empty) {
+                    map[x, y] = 0;
+                } else {
+                    map[x, y] = 1;
+                }
+            }
+        }
+        return map;
+    }
 
-        // generate walls
-        GameObject myNorthWall = Instantiate(northWall, new Vector3(0f, (floorHeight + northWall.GetComponent<SpriteRenderer>().size.y) / 2), Quaternion.identity);
-        myNorthWall.name = "myNorthWall";
-        SpriteRenderer srNorthWall = myNorthWall.GetComponent<SpriteRenderer>();
-        srNorthWall.drawMode = SpriteDrawMode.Tiled;
-        srNorthWall.size = new Vector2(floorWidth / 1.9f - srNorthWall.size.y, srNorthWall.size.y);
-        BoxCollider2D myNorthbc = myNorthWall.GetComponent<BoxCollider2D>();
-        myNorthbc.size = new Vector2(floorWidth / 1.9f - myNorthbc.size.y, myNorthbc.size.y);
-
-        GameObject myEastWall = Instantiate(eastWall, new Vector3((floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.identity);
-        myEastWall.name = "myEastWall";
-        SpriteRenderer srEastWall = myEastWall.GetComponent<SpriteRenderer>();
-        srEastWall.drawMode = SpriteDrawMode.Tiled;
-        srEastWall.size = new Vector2(srEastWall.size.y, floorHeight / 1.9f - srEastWall.size.y);
-        BoxCollider2D myEasthbc = myEastWall.GetComponent<BoxCollider2D>();
-        myEasthbc.size = new Vector2(myEasthbc.size.y, floorHeight / 1.9f - myEasthbc.size.y);
-
-        GameObject mySouthWall = Instantiate(southWall, new Vector3(0f, - (floorHeight + northWall.GetComponent<SpriteRenderer>().size.y) / 2), Quaternion.identity);
-        mySouthWall.name = "mySouthWall";
-        SpriteRenderer srSouthtWall = mySouthWall.GetComponent<SpriteRenderer>();
-        srSouthtWall.drawMode = SpriteDrawMode.Tiled;
-        srSouthtWall.size = new Vector2(floorWidth / 1.9f - srSouthtWall.size.y, srSouthtWall.size.y);
-        BoxCollider2D mySouthbc = mySouthWall.GetComponent<BoxCollider2D>();
-        mySouthbc.size = new Vector2(floorWidth / 1.9f - mySouthbc.size.y, mySouthbc.size.y);
-
-        GameObject myWestWall = Instantiate(westWall, new Vector3(- (floorWidth + northWall.GetComponent<SpriteRenderer>().size.y) / 2, 0f), Quaternion.identity);
-        myWestWall.name = "myWestWall";
-        SpriteRenderer srWestWall = myWestWall.GetComponent<SpriteRenderer>();
-        srWestWall.drawMode = SpriteDrawMode.Tiled;
-        srWestWall.size = new Vector2(srWestWall.size.y, floorHeight / 1.9f - srWestWall.size.y);
-        BoxCollider2D myWestbc = myWestWall.GetComponent<BoxCollider2D>();
-        myWestbc.size = new Vector2(myWestbc.size.y, floorHeight / 1.9f - myWestbc.size.y);
-
-        // add corners to walls
-        Vector3 cornerUpperLeftPos = new Vector3(myWestWall.transform.position.x, myNorthWall.transform.position.y, -1);
-        GameObject myCornerUpperLeft = Instantiate(cornerUpperLeft, cornerUpperLeftPos, Quaternion.identity);
-
-        Vector3 cornerUpperRightPos = new Vector3(myEastWall.transform.position.x, myNorthWall.transform.position.y, -1);
-        GameObject myCornerUpperRight = Instantiate(cornerUpperRight, cornerUpperRightPos, Quaternion.identity);
-
-        Vector3 cornerBottomRightPos = new Vector3(myEastWall.transform.position.x, mySouthWall.transform.position.y, -1);
-        GameObject myCornerBottomRight = Instantiate(cornerBottomRight, cornerBottomRightPos, Quaternion.identity);
-
-        Vector3 cornerBottomLeftPos = new Vector3(myWestWall.transform.position.x, mySouthWall.transform.position.y, -1);
-        GameObject myCornerBottomLeft = Instantiate(cornerBottomLeft, cornerBottomLeftPos, Quaternion.identity);
-
+    public void RenderMap(int[,] map) {
+        //Loop through the width of the map
+        for (int x = 0; x < map.GetUpperBound(0); x++) {
+            //Loop through the height of the map
+            for (int y = 0; y < map.GetUpperBound(1); y++) {
+                // 1 = wall, 0 = floor
+                if (map[x, y] == 1) {
+                    Instantiate(wall, new Vector3(x, y), Quaternion.identity);
+                } else {
+                    Instantiate(floor, new Vector3(x, y), Quaternion.identity);
+                }
+            }
+        }
     }
 
     // DEBUG
