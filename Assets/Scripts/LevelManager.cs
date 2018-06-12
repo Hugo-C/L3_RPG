@@ -16,7 +16,11 @@ public class LevelManager : MonoBehaviour {
     //Awake is always called before any Start functions
     void Awake() {
         if(SceneManager.GetActiveScene().name == "main") {
-            map = GenerateArray(20, 20, true);
+            System.Random rnd = new System.Random();
+            float seed = (float)rnd.NextDouble() * 10f;
+
+            map = GenerateArray(50, 50, true);
+            map = PerlinNoise(map, seed);
             RenderMap(map);
         }
         //Check if instance already exists
@@ -56,17 +60,38 @@ public class LevelManager : MonoBehaviour {
         return map;
     }
 
+    public static int[,] PerlinNoise(int[,] map, float seed) {
+        //Used to reduced the position of the Perlin point
+        float reduction = 0.5f;
+        //Create the Perlin
+        for (int x = 1; x < map.GetUpperBound(0) - 1; x++) {
+            for (int y = 1; y < map.GetUpperBound(1) - 1; y++) {
+                float xSeed = (float)x / (float)map.GetUpperBound(0) * seed;
+                float ySeed = (float)y / (float)map.GetUpperBound(1) * seed;
+                int isWall = Mathf.FloorToInt(Mathf.PerlinNoise(xSeed, ySeed) + reduction);
+                map[x, y] = isWall;
+                //Debug.Log("x : " + xSeed + " y : " + ySeed + " ~~ " + Mathf.PerlinNoise(xSeed, ySeed) + " => " + isWall);
+            }
+        }
+        return map;
+    }
+
     public void RenderMap(int[,] map) {
+        GameObject clone;
         //Loop through the width of the map
         for (int x = 0; x < map.GetUpperBound(0); x++) {
             //Loop through the height of the map
             for (int y = 0; y < map.GetUpperBound(1); y++) {
                 // 1 = wall, 0 = floor
                 if (map[x, y] == 1) {
-                    Instantiate(wall, new Vector3(x, y), Quaternion.identity);
+                    clone = Instantiate(wall, new Vector3(x, y), Quaternion.identity);
+                } else if (map[x, y] == 0) {
+                    clone = Instantiate(floor, new Vector3(x, y), Quaternion.identity);
                 } else {
-                    Instantiate(floor, new Vector3(x, y), Quaternion.identity);
+                    Debug.LogWarning("corrupted map : " + map[x, y]);
+                    clone = Instantiate(floor, new Vector3(x, y), Quaternion.identity);
                 }
+                clone.transform.parent = gameObject.transform;  // organize the editor view
             }
         }
     }
