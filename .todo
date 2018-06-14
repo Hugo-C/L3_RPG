@@ -24,9 +24,6 @@
             ajout d'un if dans Update de Spell.cs
         </comment>
     </note>
-    <note priority="high" time="1528285178">
-        pouvoir génerer une piece dans un espace/carré précis et ce de manière répété
-    </note>
     <note priority="high" time="1528323242">
         fixer les lumières (=&gt; doc Unity)
         <note priority="medium" time="1528360095">

@@ -5,29 +5,34 @@ using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
-    const int MIN_SIZE_ROOM = 10;
-    const int MAX_SIZE_ROOM = 20;
+    // const for generation
+    const int MAP_WIDTH = 50;
+    const int MAP_HEIGHT = 45;
+
+    const int ROOM_SIZE_MIN = 5;
+    const int ROOM_SIZE_MAX = 15;
+    const int FAIL_MAX = 100;
+
     public static LevelManager instance = null;  // singleton patern
     public GameObject floor;
     public GameObject wall;
 
     private int[,] map;
 
-    //Awake is always called before any Start functions
-    void Awake() {
-        if(SceneManager.GetActiveScene().name == "main") {
-            System.Random rnd = new System.Random();
-            float seed = (float)rnd.NextDouble() * 10f;
 
-            map = GenerateArray(50, 50, true);
-            map = PerlinNoise(map, seed);
-            RenderMap(map);
-        }
+    void Start() {
         //Check if instance already exists
         if (instance == null) {
             instance = this;
         } else if (instance != this) {
             Destroy(gameObject);
+        }
+        if (SceneManager.GetActiveScene().name == "main") {
+            System.Random rnd = new System.Random();
+
+            map = GenerateArray(MAP_WIDTH, MAP_HEIGHT, false);
+            map = GenerateMap(map, rnd.Next());
+            RenderMap(map);
         }
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
@@ -60,20 +65,106 @@ public class LevelManager : MonoBehaviour {
         return map;
     }
 
-    public static int[,] PerlinNoise(int[,] map, float seed) {
-        //Used to reduced the position of the Perlin point
-        float reduction = 0.5f;
-        //Create the Perlin
-        for (int x = 1; x < map.GetUpperBound(0) - 1; x++) {
-            for (int y = 1; y < map.GetUpperBound(1) - 1; y++) {
-                float xSeed = (float)x / (float)map.GetUpperBound(0) * seed;
-                float ySeed = (float)y / (float)map.GetUpperBound(1) * seed;
-                int isWall = Mathf.FloorToInt(Mathf.PerlinNoise(xSeed, ySeed) + reduction);
-                map[x, y] = isWall;
-                //Debug.Log("x : " + xSeed + " y : " + ySeed + " ~~ " + Mathf.PerlinNoise(xSeed, ySeed) + " => " + isWall);
+    private static int[,] GenerateMap(int[,] map, int seed) {
+        System.Random rnd = new System.Random(seed);
+        // first we place some random room
+        //map = GenerateRooms(map, rnd);
+
+        // then we fill walls with a maze
+        map = GenerateMaze(map, rnd);
+        Debug.Log("map generated with seed : " + seed);
+        return map;
+    }
+
+    // generate a new corridor and room from an existing room
+    private static int[,] GenerateRooms(int[,] map, System.Random rnd) {
+        int fail = 0;
+        int x, y, width, heigth;
+        while(fail < FAIL_MAX) {  // stop when the last room failed to generate
+            fail = 0;
+            width = rnd.Next(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+            heigth = rnd.Next(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+            bool success = false;  // indicate if the room is generating succesfully
+            while (!success && fail < FAIL_MAX) {
+                x = rnd.Next(1, MAP_WIDTH - width);
+                y = rnd.Next(1, MAP_HEIGHT - heigth);
+                if (IsMapFull(map, x - 1, y - 1, width + 1, heigth + 1)) { // check if the area is free
+                    for (int i = x; i < x + width; i++) {
+                        for (int j = y; j < y + heigth; j++) {
+                            map[i, j] = 0;
+                        }
+                    }
+                    success = true;
+                } else {
+                    fail++;
+                }
             }
         }
         return map;
+    }
+
+    /**
+     * Test if the given rect correspond to a full rect of wall (only 1) in the map
+     */
+    static bool IsMapFull(int[,] map, int x, int y, int width, int heigth) {
+        if(x < 0 || y < 0 || x + width > MAP_WIDTH || y + heigth > MAP_HEIGHT) {
+            Debug.LogWarning("PERFORMING OPERATION OUT OF THE MAP");
+            return false;
+        }
+
+        bool res = true;
+        for(int i = x; i <= x + width; i++) {
+            for(int j = y; j <= y + heigth; j++) {
+                if(map[i, j] != 1) {
+                    res = false;
+                }
+            }
+        }
+        return res;
+    }
+
+    // Prim's algo
+    private static int[,] GenerateMaze(int[,] map, System.Random rnd) {
+        var wallsUnvisited = new List<System.Tuple<int, int>>();
+        int x = rnd.Next(1, MAP_WIDTH-1);
+        int y = rnd.Next(1, MAP_HEIGHT-1); // TODO check if x and y is a valid cell
+        map[x, y] = 0;  // first cell of the maze
+        wallsUnvisited.AddRange(GetNeighboringWall(map, x, y));
+
+        while(wallsUnvisited.Count > 0) {
+            System.Tuple<int, int> wall = wallsUnvisited[rnd.Next(wallsUnvisited.Count)];
+            // open only if one of the two cells that the wall divides is visited
+            if (IsValidWall(map, wall)) {
+                map[wall.Item1, wall.Item2] = 0;
+                wallsUnvisited.AddRange(GetNeighboringWall(map, wall.Item1, wall.Item2));
+            }
+            wallsUnvisited.Remove(wall);
+        }
+        return map;
+    }
+
+    private static List<System.Tuple<int, int>> GetNeighboringWall(int[,] map, int x, int y) {
+        var list = new List<System.Tuple<int, int>>();
+        for (int i = x - 1; i <= x + 1; i++) {
+            for (int j = y - 1; j <= y + 1; j++) {
+                if (i > 0 && i < MAP_WIDTH - 2 && j > 0 && j < MAP_HEIGHT - 2) {
+                    if (!(i == x && j == y)) {
+                        if  (map[i, j] == 1){
+                            list.Add(System.Tuple.Create<int, int>(i, j));
+                        }
+                    }
+                }
+            }
+        }
+        return list;
+    }        
+
+    private static bool IsValidWall(int[,] map, System.Tuple<int, int> wall) {
+        if(map[wall.Item1 - 1, wall.Item2 - 1] + map[wall.Item1 - 1, wall.Item2 + 1] + map[wall.Item1 + 1, wall.Item2 - 1] + map[wall.Item1 + 1, wall.Item2 + 1] >= 2) {
+            return map[wall.Item1 - 1, wall.Item2] + map[wall.Item1 + 1, wall.Item2] == 1 && map[wall.Item1, wall.Item2 - 1] + map[wall.Item1, wall.Item2 + 1] == 2 ||
+                   map[wall.Item1 - 1, wall.Item2] + map[wall.Item1 + 1, wall.Item2] == 2 && map[wall.Item1, wall.Item2 - 1] + map[wall.Item1, wall.Item2 + 1] == 1;
+        }
+        return false;
     }
 
     public void RenderMap(int[,] map) {
