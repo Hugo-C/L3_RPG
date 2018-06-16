@@ -624,7 +624,7 @@ PlayerSettings:
     Collab: 0
     UNet: 1
   facebookSdkVersion: 7.9.4
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 3
   cloudProjectId: deca1aaa-d0d1-4490-8d2b-ff201bfb4d0f
   projectName: L3_RPG (1)
   organizationId: chastel

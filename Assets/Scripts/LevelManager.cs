@@ -6,12 +6,14 @@ using UnityEngine.SceneManagement;
 public class LevelManager : MonoBehaviour {
 
     // const for generation
-    const int MAP_WIDTH = 50;
-    const int MAP_HEIGHT = 45;
+    const int MAP_WIDTH = 101;
+    const int MAP_HEIGHT = 61;
 
     const int ROOM_SIZE_MIN = 5;
     const int ROOM_SIZE_MAX = 15;
     const int FAIL_MAX = 100;
+
+    enum Direction { N, S, E, W };
 
     public static LevelManager instance = null;  // singleton patern
     public GameObject floor;
@@ -20,7 +22,7 @@ public class LevelManager : MonoBehaviour {
     private int[,] map;
 
 
-    void Start() {
+    void Awake() {
         //Check if instance already exists
         if (instance == null) {
             instance = this;
@@ -28,11 +30,7 @@ public class LevelManager : MonoBehaviour {
             Destroy(gameObject);
         }
         if (SceneManager.GetActiveScene().name == "main") {
-            System.Random rnd = new System.Random();
-
-            map = GenerateArray(MAP_WIDTH, MAP_HEIGHT, false);
-            map = GenerateMap(map, rnd.Next());
-            RenderMap(map);
+            LoadLevel();
         }
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
@@ -45,12 +43,37 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// Load the specified scene 
+    /// </summary>
+    /// <param name="scene">the scene to load</param>
     public void LoadScene(string scene) {
         SceneManager.LoadScene(scene);
+        if(scene == "main") {
+            LoadLevel();
+        }
     }
 
+    /// <summary>
+    /// Load a random dungeon level
+    /// </summary>
+    private void LoadLevel() {
+        System.Random rnd = new System.Random();
+
+        map = GenerateArray(MAP_WIDTH, MAP_HEIGHT, false);
+        map = GenerateMap(map, rnd.Next());
+        RenderMap(map);
+    }
+
+    /// <summary>
+    /// Generate a 2D array either of 1 or 0
+    /// </summary>
+    /// <param name="width">width of the 2D array</param>
+    /// <param name="height">height of the 2D array</param>
+    /// <param name="empty">if empty => the 2D array if full of 0 else full of 1</param>
+    /// <returns>the 2D array generated</returns>
     public static int[,] GenerateArray(int width, int height, bool empty) {
-        int[,] map = new int[width, height];
+        int[,] map = new int[width + 1, height + 1];
         for (int x = 0; x < map.GetUpperBound(0); x++) {
             for (int y = 0; y < map.GetUpperBound(1); y++) {
                 if (x == 0 || x == map.GetUpperBound(0) - 1 || y == 0 || y == map.GetUpperBound(1) - 1) {
@@ -65,10 +88,16 @@ public class LevelManager : MonoBehaviour {
         return map;
     }
 
+    /// <summary>
+    /// Generate a map representing a rogue-like level
+    /// </summary>
+    /// <param name="map">the map composed of wall (1) to transform</param>
+    /// <param name="seed">the seed used in RNG</param>
+    /// <returns>the generated map</returns>
     private static int[,] GenerateMap(int[,] map, int seed) {
-        System.Random rnd = new System.Random(seed);
+        MyRandom rnd = new MyRandom(seed);
         // first we place some random room
-        //map = GenerateRooms(map, rnd);
+        map = GenerateRooms(map, rnd);
 
         // then we fill walls with a maze
         map = GenerateMaze(map, rnd);
@@ -76,18 +105,24 @@ public class LevelManager : MonoBehaviour {
         return map;
     }
 
-    // generate a new corridor and room from an existing room
-    private static int[,] GenerateRooms(int[,] map, System.Random rnd) {
+    /// <summary>
+    /// Generate several room inside the map
+    /// rooms don't collide and are placed at odd coordinates
+    /// </summary>
+    /// <param name="map">the map rooms will be placed into</param>
+    /// <param name="rnd">the random genrator used</param>
+    /// <returns>the map containing rooms</returns>
+    private static int[,] GenerateRooms(int[,] map, MyRandom rnd) {
         int fail = 0;
         int x, y, width, heigth;
         while(fail < FAIL_MAX) {  // stop when the last room failed to generate
             fail = 0;
-            width = rnd.Next(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
-            heigth = rnd.Next(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+            width = rnd.NextOdd(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
+            heigth = rnd.NextOdd(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
             bool success = false;  // indicate if the room is generating succesfully
             while (!success && fail < FAIL_MAX) {
-                x = rnd.Next(1, MAP_WIDTH - width);
-                y = rnd.Next(1, MAP_HEIGHT - heigth);
+                x = rnd.NextOdd(1, MAP_WIDTH - width);  // select only odd size
+                y = rnd.NextOdd(1, MAP_HEIGHT - heigth);
                 if (IsMapFull(map, x - 1, y - 1, width + 1, heigth + 1)) { // check if the area is free
                     for (int i = x; i < x + width; i++) {
                         for (int j = y; j < y + heigth; j++) {
@@ -103,9 +138,15 @@ public class LevelManager : MonoBehaviour {
         return map;
     }
 
-    /**
-     * Test if the given rect correspond to a full rect of wall (only 1) in the map
-     */
+    /// <summary>
+    /// Test if the given rectangle correspond to a full rectangle of wall (only 1) in the map
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="x">x coordinate of the rectangle</param>
+    /// <param name="y">y coordinate of the rectangle</param>
+    /// <param name="width">width of the rectangle</param>
+    /// <param name="heigth">heigth of the rectangle</param>
+    /// <returns>a boolean indicating if the map contains only wall(1) in the rectangle</returns>
     static bool IsMapFull(int[,] map, int x, int y, int width, int heigth) {
         if(x < 0 || y < 0 || x + width > MAP_WIDTH || y + heigth > MAP_HEIGHT) {
             Debug.LogWarning("PERFORMING OPERATION OUT OF THE MAP");
@@ -123,50 +164,141 @@ public class LevelManager : MonoBehaviour {
         return res;
     }
 
-    // Prim's algo
-    private static int[,] GenerateMaze(int[,] map, System.Random rnd) {
-        var wallsUnvisited = new List<System.Tuple<int, int>>();
-        int x = rnd.Next(1, MAP_WIDTH-1);
-        int y = rnd.Next(1, MAP_HEIGHT-1); // TODO check if x and y is a valid cell
-        map[x, y] = 0;  // first cell of the maze
-        wallsUnvisited.AddRange(GetNeighboringWall(map, x, y));
-
-        while(wallsUnvisited.Count > 0) {
-            System.Tuple<int, int> wall = wallsUnvisited[rnd.Next(wallsUnvisited.Count)];
-            // open only if one of the two cells that the wall divides is visited
-            if (IsValidWall(map, wall)) {
-                map[wall.Item1, wall.Item2] = 0;
-                wallsUnvisited.AddRange(GetNeighboringWall(map, wall.Item1, wall.Item2));
+    /// <summary>
+    /// Generate a maze using the Recursive Backtracking's Algo
+    /// the maze won't overlapse with rooms if they are present
+    /// </summary>
+    /// <param name="map">the map where the maze will be generated</param>
+    /// <param name="rnd">the random genrator used</param>
+    /// <returns>the map containing a maze</returns>
+    private static int[,] GenerateMaze(int[,] map, MyRandom rnd) {
+        map = PierceArray(map);  // we first pierce the array with unvisited cell
+        for (int x = 1; x < map.GetUpperBound(0); x += 2) {
+            for (int y = 1; y < map.GetUpperBound(1); y += 2) {
+                if(map[x, y] == -1) {
+                    map[x, y] = 0;  // first cell of the maze : 0 => explored
+                    map = CarvePassageFrom(map, rnd, x, y);
+                }
             }
-            wallsUnvisited.Remove(wall);
         }
         return map;
     }
 
-    private static List<System.Tuple<int, int>> GetNeighboringWall(int[,] map, int x, int y) {
-        var list = new List<System.Tuple<int, int>>();
-        for (int i = x - 1; i <= x + 1; i++) {
-            for (int j = y - 1; j <= y + 1; j++) {
-                if (i > 0 && i < MAP_WIDTH - 2 && j > 0 && j < MAP_HEIGHT - 2) {
-                    if (!(i == x && j == y)) {
-                        if  (map[i, j] == 1){
-                            list.Add(System.Tuple.Create<int, int>(i, j));
-                        }
-                    }
+    /// <summary>
+    /// Pierce a 2D array at odd coordinates if it's not occupied by a room
+    /// those coordinates are replaced by -1
+    /// </summary>
+    /// <param name="map">the map to transform</param>
+    /// <returns>the transformed map</returns>
+    public static int[,] PierceArray(int[,] map) {
+        for (int x = 1; x < map.GetUpperBound(0); x += 2) {
+            for (int y = 1; y < map.GetUpperBound(1); y += 2) {
+                if (map[x, y] != 0) {
+                    map[x, y] = -1; // -1 => unvisited by maze generation
                 }
             }
         }
-        return list;
-    }        
+        return map;
+    }
 
-    private static bool IsValidWall(int[,] map, System.Tuple<int, int> wall) {
-        if(map[wall.Item1 - 1, wall.Item2 - 1] + map[wall.Item1 - 1, wall.Item2 + 1] + map[wall.Item1 + 1, wall.Item2 - 1] + map[wall.Item1 + 1, wall.Item2 + 1] >= 2) {
-            return map[wall.Item1 - 1, wall.Item2] + map[wall.Item1 + 1, wall.Item2] == 1 && map[wall.Item1, wall.Item2 - 1] + map[wall.Item1, wall.Item2 + 1] == 2 ||
-                   map[wall.Item1 - 1, wall.Item2] + map[wall.Item1 + 1, wall.Item2] == 2 && map[wall.Item1, wall.Item2 - 1] + map[wall.Item1, wall.Item2 + 1] == 1;
+    /// <summary>
+    /// Try to carve a passage from the given coordinates int the map in order to expend the maze
+    /// </summary>
+    /// <param name="map">the map used</param>
+    /// <param name="rnd">the random genrator used</param>
+    /// <param name="x">the x coordinate</param>
+    /// <param name="y">the y coordinate</param>
+    /// <returns>the carved map</returns>
+    private static int[,] CarvePassageFrom(int[,] map, MyRandom rnd, int x, int y) {
+        System.Array directions = System.Enum.GetValues(typeof(Direction));
+        Shuffle<Direction>(rnd, directions);
+        foreach (Direction dir in directions) {
+            System.Tuple<int, int> wall = System.Tuple.Create(x + DX(dir), y + DY(dir));
+            if (IsValidWall(map, wall, dir)) {  // open only if one of the two cells that the wall divides is visited      
+                map[wall.Item1, wall.Item2] = 0;
+                map[wall.Item1 + DX(dir), wall.Item2 + DY(dir)] = 0;
+                CarvePassageFrom(map, rnd, wall.Item1 + DX(dir), wall.Item2 + DY(dir));
+            }
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Check if the wall can be carved to expend the maze
+    /// </summary>
+    /// <param name="map">the map used</param>
+    /// <param name="wall">the wall to test</param>
+    /// <param name="dir">the direction from where we want to carve the wall</param>
+    /// <returns>boolean indicating if the wall can be carved</returns>
+    private static bool IsValidWall(int[,] map, System.Tuple<int, int> wall, Direction dir) {
+        if(0 < wall.Item1 && wall.Item1 < MAP_WIDTH - 1 && 0 < wall.Item2 && wall.Item2 < MAP_HEIGHT - 1) {
+            return map[wall.Item1, wall.Item2] == 1 && map[wall.Item1 + DX(dir), wall.Item2 + DY(dir)] == -1; // a wall going to a place not already visited
         }
         return false;
     }
 
+    /// <summary>
+    /// Indicate the value to be added to the x axis by the direction d
+    /// </summary>
+    /// <param name="d">the direction</param>
+    /// <returns>the integer value of the direction on the x axis</returns>
+    private static int DX(Direction d) {
+        switch (d) {
+            case Direction.E:
+                return 1;
+            case Direction.W:
+                return -1;
+            case Direction.N:
+                return 0;
+            case Direction.S:
+                return 0;
+            default:
+                Debug.LogWarning("ERROR : NOT A DIRECTION");
+                return 0;
+        }
+    }
+
+    /// <summary>
+    /// Indicate the value to be added to the y axis by the direction d
+    /// </summary>
+    /// <param name="d">the direction</param>
+    /// <returns>the integer value of the direction on the y axis</returns>
+    private static int DY(Direction d) {
+        switch (d) {
+            case Direction.E:
+                return 0;
+            case Direction.W:
+                return 0;
+            case Direction.N:
+                return 1;
+            case Direction.S:
+                return -1;
+            default:
+                Debug.LogWarning("ERROR : NOT A DIRECTION");
+                return 0;
+        }
+    }
+
+    /// <summary>
+    /// Shuffle the array
+    /// </summary>
+    /// <typeparam name="T">the type of the elements in the array</typeparam>
+    /// <param name="rng">the random generator used</param>
+    /// <param name="array">the array to shuffle</param>
+    public static void Shuffle<T>(MyRandom rng, System.Array array) {
+        int n = array.Length;
+        while (n > 1) {
+            int k = rng.Next(n--);
+            T temp = (T)array.GetValue(n);
+            array.SetValue(array.GetValue(k), n);
+            array.SetValue(temp, k);
+        }
+    }
+
+    /// <summary>
+    /// Render the map
+    /// </summary>
+    /// <param name="map">the map to be render</param>
     public void RenderMap(int[,] map) {
         GameObject clone;
         //Loop through the width of the map
@@ -179,7 +311,7 @@ public class LevelManager : MonoBehaviour {
                 } else if (map[x, y] == 0) {
                     clone = Instantiate(floor, new Vector3(x, y), Quaternion.identity);
                 } else {
-                    Debug.LogWarning("corrupted map : " + map[x, y]);
+                    Debug.LogWarning("corrupted map : " + map[x, y] + " x : " + x + " y : " + y);
                     clone = Instantiate(floor, new Vector3(x, y), Quaternion.identity);
                 }
                 clone.transform.parent = gameObject.transform;  // organize the editor view
