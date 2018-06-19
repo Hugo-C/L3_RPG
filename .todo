@@ -3,6 +3,9 @@
     <note priority="high" time="1523143099" done="1528213914">
         ajuster les hitbox des murs
     </note>
+    <note priority="medium" time="1528306010" done="1529436747">
+        ajouter une porte à un mur d'une piece
+    </note>
     <note priority="low" time="1521027495" done="1528214398">
         enlever les spells dupliqué de l'attaque en spiral
         <comment>
@@ -30,7 +33,13 @@
             ajuster l'intensité pour qu'elle soit progressive (exemple : à la fin d'un sort)
         </note>
     </note>
-    <note priority="medium" time="1528306010">
-        ajouter une porte à un mur d'une piece
+    <note priority="medium" time="1529436795">
+        faire en sorte que toutes les pieces soit accessible
+    </note>
+    <note priority="medium" time="1529436938">
+        BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
+    </note>
+    <note priority="low" time="1529437749">
+        Ajouter aleatoirement des entrées aux salles ou entre les corridors
     </note>
 </todo>

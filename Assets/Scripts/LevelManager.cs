@@ -11,7 +11,7 @@ public class LevelManager : MonoBehaviour {
 
     const int ROOM_SIZE_MIN = 5;
     const int ROOM_SIZE_MAX = 15;
-    const int FAIL_MAX = 100;
+    const int FAIL_MAX = 25;
 
     enum Direction { N, S, E, W };
 
@@ -101,6 +101,11 @@ public class LevelManager : MonoBehaviour {
 
         // then we fill walls with a maze
         map = GenerateMaze(map, rnd);
+        List<System.Tuple<int, int>> connectors = FindConnectors(map);
+        Debug.Log("connectors retrieved : " + connectors.Count);
+        Shuffle(rnd, connectors);
+        map = OpenConnector(map, connectors, rnd);
+        map = Uncarve(map);  // remove dead ends
         Debug.Log("map generated with seed : " + seed);
         return map;
     }
@@ -115,6 +120,7 @@ public class LevelManager : MonoBehaviour {
     private static int[,] GenerateRooms(int[,] map, MyRandom rnd) {
         int fail = 0;
         int x, y, width, heigth;
+        int nbrRooms = 0;
         while(fail < FAIL_MAX) {  // stop when the last room failed to generate
             fail = 0;
             width = rnd.NextOdd(ROOM_SIZE_MIN, ROOM_SIZE_MAX);
@@ -126,10 +132,11 @@ public class LevelManager : MonoBehaviour {
                 if (IsMapFull(map, x - 1, y - 1, width + 1, heigth + 1)) { // check if the area is free
                     for (int i = x; i < x + width; i++) {
                         for (int j = y; j < y + heigth; j++) {
-                            map[i, j] = 0;
+                            map[i, j] = nbrRooms + 2;
                         }
                     }
                     success = true;
+                    nbrRooms++;
                 } else {
                     fail++;
                 }
@@ -193,7 +200,7 @@ public class LevelManager : MonoBehaviour {
     public static int[,] PierceArray(int[,] map) {
         for (int x = 1; x < map.GetUpperBound(0); x += 2) {
             for (int y = 1; y < map.GetUpperBound(1); y += 2) {
-                if (map[x, y] != 0) {
+                if (map[x, y] <= 1) {
                     map[x, y] = -1; // -1 => unvisited by maze generation
                 }
             }
@@ -238,6 +245,146 @@ public class LevelManager : MonoBehaviour {
     }
 
     /// <summary>
+    /// Get all the connectors in the map
+    /// 
+    /// a connector is wall between a room and a wall or another room
+    /// </summary>
+    /// <param name="map">the map where to retrieve the connector</param>
+    /// <returns>a List of tuple, containing coorinates for those connectors</returns>
+    private static List<System.Tuple<int, int>> FindConnectors(int[,] map) {
+        //System.Tuple<int, int> wall = System.Tuple<int, int>.Create(x + DX(dir), y + DY(dir));
+        List<System.Tuple<int, int>> connectors = new List<System.Tuple<int, int>>();
+        for (int x = 1; x < map.GetUpperBound(0) - 1; x++) {
+            for (int y = 1; y < map.GetUpperBound(1) - 1; y++) {
+                if (IsValidConnector(map, x, y)){
+                    System.Tuple<int, int> connector = System.Tuple.Create(x, y);
+                    connectors.Add(connector);
+                }
+            }
+        }
+        return connectors;
+    }
+
+    /// <summary>
+    /// Check if a coordinate in the map is a valid connector
+    /// </summary>
+    /// <param name="map">the map where to check the connector</param>
+    /// <param name="x">x coordinate of the case to check</param>
+    /// <param name="y">y coordinate of the case to check</param>
+    /// <returns></returns>
+    private static bool IsValidConnector(int[,] map, int x, int y) {
+        if (map[x, y] == 1) {
+            if(map[x + 1, y] != 1 && map[x - 1, y] != 1 &&  map[x + 1, y] != map[x - 1, y] ||
+               map[x, y + 1] != 1 && map[x, y - 1] != 1 && map[x, y + 1] != map[x, y - 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Open some connectors in order to allow access to rooms
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="connectors">the list of all the connectors of the map</param>
+    /// <param name="rnd">the random genrator used</param>
+    /// <returns>the trnsformed map</returns>
+    private static int[,] OpenConnector(int[,] map, List<System.Tuple<int, int>> connectors, MyRandom rnd) {
+        foreach (System.Tuple<int, int> connector in connectors) {
+            Direction dir = Direction.E;
+            if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 1) {
+                dir = Direction.N;
+            }
+            // if the connector is on an already open area
+            if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 0 && map[connector.Item1 + DX(Oppose(dir)), connector.Item2 + DY(Oppose(dir))] == 0) {
+                Debug.Log("already open !");  // TODO
+            } else {
+                //Debug.Log("direction : " + dir.ToString() + " : " + map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] + " " + map[connector.Item1 + DX(Oppose(dir)), connector.Item2 + DY(Oppose(dir))]);
+                if(map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 0) {
+                    dir = Oppose(dir);
+                }
+                int prevValue = map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)];
+                if(prevValue > 1) {
+                    map = FloodFill(map, connector.Item1, connector.Item2, prevValue, 0);
+                }
+            }
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Change the given coordinate to currentValue and try to change adjacent case of prevValue to currentValue
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="x">x coordinate of the case to set to currentvalue and from where floodfill will spread</param>
+    /// <param name="y">y coordinate of the case to set to currentvalue and from where floodfill will spread</param>
+    /// <param name="prevValue">the value used to spread floodfill</param>
+    /// <param name="currentValue">the value spread by floodfill on adjacent case of value prevValue</param>
+    /// <returns>the transformed map</returns>
+    private static int[,] FloodFill(int[,] map, int x, int y, int prevValue, int currentValue) {
+        map[x, y] = currentValue;
+        //Debug.Log("flood fill : " + x + ", " + y);
+        System.Array directions = System.Enum.GetValues(typeof(Direction));
+        foreach (Direction dir in directions) {
+            if(x + DX(dir) > 0 && x + DX(dir) < map.GetUpperBound(0) && y + DY(dir) > 0 && y + DY(dir) < map.GetUpperBound(1) && map[x + DX(dir), y + DY(dir)] == prevValue) {
+                map = FloodFill(map, x + DX(dir), y + DY(dir), prevValue, currentValue);
+            }
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Replace dead ends by walls
+    /// </summary>
+    /// <param name="map"></param>
+    /// <returns>the transformed map</returns>
+    private static int[,] Uncarve(int[,] map) {
+        for (int x = 1; x < map.GetUpperBound(0) - 1; x++) {
+            for (int y = 1; y < map.GetUpperBound(1) - 1; y++) {
+                // Check if it's a dead end
+                if (IsDeadEnd(map, x, y)) {
+                    Debug.Log("dead end find ! : " + x + ", " + y);
+                    map = UncarveDeadEnd(map, x, y);
+                }
+            }
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Uncarve a dead end starting from the given coordinates
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns>the transformed map</returns>
+    private static int[,] UncarveDeadEnd(int[,] map, int x, int y) {
+        map[x, y] = 1;  // fill the dead end with wall
+        // then we look if an adjacent case is a dead end
+        System.Array directions = System.Enum.GetValues(typeof(Direction));
+        foreach (Direction dir in directions) {
+            if (x + DX(dir) > 0 && x + DX(dir) < map.GetUpperBound(0) && y + DY(dir) > 0 && y + DY(dir) < map.GetUpperBound(1) && IsDeadEnd(map, x + DX(dir), y + DY(dir))) {
+                map = UncarveDeadEnd(map, x + DX(dir), y + DY(dir));
+                //break;  // there can be only one adjacent dead end (since the previous case was a dead end) 
+            }
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// Check if the coordinate is a dead end
+    /// 
+    /// a dead end is a floor with three or more adjacent walls
+    /// </summary>
+    /// <param name="map"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private static bool IsDeadEnd(int[,] map, int x, int y) {
+        return map[x, y] == 0 && map[x - 1, y] + map[x + 1, y] + map[x, y - 1] + map[x, y + 1] >= 3;
+    }
+
+    /// <summary>
     /// Indicate the value to be added to the x axis by the direction d
     /// </summary>
     /// <param name="d">the direction</param>
@@ -279,19 +426,51 @@ public class LevelManager : MonoBehaviour {
         }
     }
 
+    private static Direction Oppose(Direction d) {
+        switch (d) {
+            case Direction.E:
+                return Direction.W;
+            case Direction.W:
+                return Direction.E;
+            case Direction.N:
+                return Direction.S;
+            case Direction.S:
+                return Direction.N;
+            default:
+                Debug.LogWarning("ERROR : NOT A DIRECTION");
+                return 0;
+        }
+    }
+
     /// <summary>
     /// Shuffle the array
     /// </summary>
     /// <typeparam name="T">the type of the elements in the array</typeparam>
     /// <param name="rng">the random generator used</param>
     /// <param name="array">the array to shuffle</param>
-    public static void Shuffle<T>(MyRandom rng, System.Array array) {
+    public static void Shuffle<T>(MyRandom rng, System.Array array) {  // TODO : return tab ?
         int n = array.Length;
         while (n > 1) {
             int k = rng.Next(n--);
-            T temp = (T)array.GetValue(n);
+            T tmp = (T)array.GetValue(n);
             array.SetValue(array.GetValue(k), n);
-            array.SetValue(temp, k);
+            array.SetValue(tmp, k);
+        }
+    }
+
+    /// <summary>
+    /// Shuffle the list
+    /// </summary>
+    /// <typeparam name="T">the type of the elements in the list</typeparam>
+    /// <param name="rng">the random generator used</param>
+    /// <param name="list">the list to shuffle</param>
+    public static void Shuffle<T>(MyRandom rng, List<T> list) {
+        int n = list.Count;
+        while (n > 1) {
+            int k = rng.Next(n--);
+            T tmp = (T)list[n];
+            list[n] = list[k];
+            list[k] = tmp;
         }
     }
 
@@ -314,7 +493,7 @@ public class LevelManager : MonoBehaviour {
                     Debug.LogWarning("corrupted map : " + map[x, y] + " x : " + x + " y : " + y);
                     clone = Instantiate(floor, new Vector3(x, y), Quaternion.identity);
                 }
-                clone.transform.parent = gameObject.transform;  // organize the editor view
+                clone.transform.parent = gameObject.transform;  // organize the editor view TODO change since it won't destroy itself on load => 
             }
         }
     }
