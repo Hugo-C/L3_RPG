@@ -4,26 +4,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MovingObject {
+    private const int AnimIdle = 0;
+    private const int AnimWalkFront = 1;
+    private const int AnimWalkRight = 2;
+    private const int AnimWalkBack = 3;
+    private const int AnimWalkLeft = 4;
+    private const float MoveCoef = 0.1f;
+    private const float SpellCooldown = 0.5f;
+    private const float SpiralSpellCooldown = 1f;
+    private const float InvunerableTime = 1f;
 
-    const int ANIM_IDLE = 0;
-    const int ANIM_WALK_FRONT = 1;
-    const int ANIM_WALK_RIGHT = 2;
-    const int ANIM_WALK_BACK = 3;
-    const int ANIM_WALK_LEFT = 4;
-    const float MOVE_COEF = 0.1f;
-    const float SPELL_COOLDOWN = 0.5f;
-    const float SPIRAL_SPELL_COOLDOWN = 1f;
-    const float INVUNERABLE_TIME = 1f;
+    private Animator _animator;
+    private List<string> _collidingTag;  // tag the player can collide with
 
-    private Animator animator;
-    List<string> collidingTag;  // tag the player can collide with
+    public GameObject Spell;
+    public GameObject Heart;
+    public bool Invulnerable;  // use to limit the number of hit taken per minute
 
-    public GameObject spell;
-    public GameObject heart;
-    public bool invulnerable;  // use to limit the number of hit taken per minute
-
-    private bool spellOnCoolDown;  // use to limit the number of cast per minute
-    private bool spiralSpellOnCoolDown;
+    private bool _spellOnCoolDown;  // use to limit the number of cast per minute
+    private bool _spiralSpellOnCoolDown;
     private int _life;
 
     public int Life {
@@ -39,37 +38,33 @@ public class Player : MovingObject {
 
     // Use this for initialization
     protected override void Start () {
-        animator = gameObject.GetComponent<Animator>();
-        collidingTag = new List<string> { "BlockingBg" };
-        spellOnCoolDown = false;
+        _animator = gameObject.GetComponent<Animator>();
+        _collidingTag = new List<string> { "BlockingBg" };
+        _spellOnCoolDown = false;
         Life = 3;
         base.Start();
     }
 	
 	// Update is called once per frame
 	void Update () {
-        float horizontal = 0f;
-        float vertical = 0f;
-        float horizontalFire = 0f;
-        float verticalFire = 0f;
 
-        horizontal = Input.GetAxisRaw("Horizontal") * MOVE_COEF;
-        vertical = Input.GetAxisRaw("Vertical") * MOVE_COEF;
+        float horizontal = Input.GetAxisRaw("Horizontal") * MoveCoef;
+        float vertical = Input.GetAxisRaw("Vertical") * MoveCoef;
         if (horizontal != 0) {
             vertical = 0;  // the player can't move diagnoly (for now at least)
         }
         HandleAnimation(horizontal, vertical);
         if (horizontal != 0 || vertical != 0) {
-            AttemptMove(horizontal, vertical, collidingTag);
+            AttemptMove(horizontal, vertical, _collidingTag);
         }
 
-        horizontalFire = Input.GetAxisRaw("HorizontalFire");
-        verticalFire = Input.GetAxisRaw("VerticalFire");
-        if ((horizontalFire != 0 || verticalFire != 0) && !spellOnCoolDown) {
+        float horizontalFire = Input.GetAxisRaw("HorizontalFire");
+        float verticalFire = Input.GetAxisRaw("VerticalFire");
+        if ((horizontalFire != 0 || verticalFire != 0) && !_spellOnCoolDown) {
             StartCoroutine(CastSpell(horizontalFire, verticalFire, true));
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !spiralSpellOnCoolDown) {
+        if (Input.GetKeyDown(KeyCode.Space) && !_spiralSpellOnCoolDown) {
             Debug.Log("je cast une spirale");
             StartCoroutine(CastSpiralSpell());
         }
@@ -77,15 +72,15 @@ public class Player : MovingObject {
 
     private void HandleAnimation(float horizontal, float vertical) {
         if (vertical == 0 && horizontal == 0) {
-            animator.SetInteger("walk", ANIM_IDLE);  // we don't have yet an idle animation
+            _animator.SetInteger("walk", AnimIdle);  // we don't have yet an idle animation
         } else if (vertical > 0) {
-            animator.SetInteger("walk", ANIM_WALK_FRONT);
+            _animator.SetInteger("walk", AnimWalkFront);
         } else if (horizontal > 0) {
-            animator.SetInteger("walk", ANIM_WALK_RIGHT);
+            _animator.SetInteger("walk", AnimWalkRight);
         } else if (vertical < 0) {
-            animator.SetInteger("walk", ANIM_WALK_BACK);
+            _animator.SetInteger("walk", AnimWalkBack);
         } else if (horizontal < 0) {
-            animator.SetInteger("walk", ANIM_WALK_LEFT);
+            _animator.SetInteger("walk", AnimWalkLeft);
         } else {
             Debug.Log("error in HandleAnimation : InvalidValue");
         }
@@ -93,7 +88,7 @@ public class Player : MovingObject {
 
     // Cast spell in all directions
     private IEnumerator CastSpiralSpell() {
-        spiralSpellOnCoolDown = true;
+        _spiralSpellOnCoolDown = true;
         for (float i = -1f; i <= 1f; i += UnityEngine.Random.Range(0.25f, 0.5f)) {
             // we fire in both direction (up and down)
             if(i != -1f) {
@@ -104,8 +99,8 @@ public class Player : MovingObject {
                 StartCoroutine(CastSpell(-i, 1f, false));
             }
         }
-        yield return new WaitForSeconds(SPELL_COOLDOWN);
-        spiralSpellOnCoolDown = false;
+        yield return new WaitForSeconds(SpellCooldown);
+        _spiralSpellOnCoolDown = false;
     }
 
     /**
@@ -115,23 +110,23 @@ public class Player : MovingObject {
      */
     private IEnumerator CastSpell(float horizontalFire, float verticalFire, bool castedByPlayer) {
         if (castedByPlayer) {
-            spellOnCoolDown = true;
+            _spellOnCoolDown = true;
         }
-        float z;
-        z = (float)(Math.Acos((double) (horizontalFire)) * 180 / Math.PI);
+
+        float z = (float)(Math.Acos((double) (horizontalFire)) * 180 / Math.PI);
         if ((float)(Math.Asin((double)(verticalFire)) * 180 / Math.PI) > 0) {
             z = -z;
         }
         Vector3 v = new Vector3(0f, 0f, z + 90f);
-        Instantiate(spell, gameObject.transform.position, Quaternion.Euler(v));
-        yield return new WaitForSeconds(SPELL_COOLDOWN);
+        Instantiate(Spell, gameObject.transform.position, Quaternion.Euler(v));
+        yield return new WaitForSeconds(SpellCooldown);
         if(castedByPlayer) {
-            spellOnCoolDown = false;
+            _spellOnCoolDown = false;
         }
     }
 
-    protected override void OnCantMove(GameObject gameObject) {
-        if (gameObject != null) {
+    protected override void OnCantMove(GameObject go) {
+        if (go != null) {
             //Debug.Log("i can't move, i hit : " + gameObject.name);
         }
     }
@@ -141,15 +136,15 @@ public class Player : MovingObject {
     }
 
     private IEnumerator MyHit() {
-        if (!invulnerable) {
-            invulnerable = true;
+        if (!Invulnerable) {
+            Invulnerable = true;
             Life--;
             if(Life == 0) {
-                LevelManager levelManager = LevelManager.instance;
+                LevelManager levelManager = LevelManager.Instance;
                 levelManager.LoadScene("endGame");
             }
-            yield return new WaitForSeconds(INVUNERABLE_TIME);
-            invulnerable = false;
+            yield return new WaitForSeconds(InvunerableTime);
+            Invulnerable = false;
         }
     }
 
@@ -159,13 +154,13 @@ public class Player : MovingObject {
         Vector3 original = new Vector3(-0.35f, 1f) + gameObject.transform.position;
         for(int i=0; i < lifeToDisplay; i++) {
             Vector3 shift = new Vector3(0.35f*i, 0f);
-            GameObject go = Instantiate(heart, original + shift , Quaternion.identity);
+            GameObject go = Instantiate(Heart, original + shift , Quaternion.identity);
             go.transform.position = original + shift;
             go.transform.SetParent(gameObject.transform);
         }
     }
 
-    public void RemoveLife() {
+    private void RemoveLife() {
         foreach (Transform child in transform) {
             Destroy(child.gameObject);
         }

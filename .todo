@@ -33,13 +33,22 @@
             ajuster l'intensité pour qu'elle soit progressive (exemple : à la fin d'un sort)
         </note>
     </note>
-    <note priority="medium" time="1529436795">
+    <note priority="high" time="1529440172">
+        arreter d'avoir que des methodes statics =&gt; utiliser map comme un attribut
+    </note>
+    <note priority="medium" time="1529436795" done="1530570836">
         faire en sorte que toutes les pieces soit accessible
+        <comment>
+            ouvre des connecteurs aléatoirements suivant un ratio
+        </comment>
     </note>
     <note priority="medium" time="1529436938">
         BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
     </note>
     <note priority="low" time="1529437749">
         Ajouter aleatoirement des entrées aux salles ou entre les corridors
+    </note>
+    <note priority="verylow" time="1529441393">
+        GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/
     </note>
 </todo>

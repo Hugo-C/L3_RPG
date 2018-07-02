@@ -155,11 +155,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8aa0b6ecc0bad4049bd0ba5fb027386f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 0
-  blockingLayer:
+  MoveTime: 0
+  BlockingLayer:
     serializedVersion: 2
     m_Bits: 256
-  bouncingSpell: {fileID: 1746701534414868, guid: 66ae01cfa44fab345b84a2fc4975e275,
+  BouncingSpell: {fileID: 1746701534414868, guid: 66ae01cfa44fab345b84a2fc4975e275,
     type: 2}
 --- !u!212 &212532396503223432
 SpriteRenderer:

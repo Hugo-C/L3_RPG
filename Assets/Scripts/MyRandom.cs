@@ -2,8 +2,17 @@
 
 public class MyRandom : Random {
 
+    public int Seed { get; }
+
+    public MyRandom() : this(GenerateSeed()) {
+    }
+
     public MyRandom(int seed) : base(seed) {
-        UnityEngine.Debug.Log("random initialized");
+        Seed = seed;
+    }
+
+    private static int GenerateSeed() {        
+        return System.DateTime.Now.Millisecond;
     }
 
     /// <summary>
@@ -19,7 +28,7 @@ public class MyRandom : Random {
         }
         int res;
         do {
-            res = this.Next(minValue, maxValue);
+            res = Next(minValue, maxValue);
         } while (res % 2 == 0);
         return res;
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 public class StartButton : MyButton {
 
     public override void TaskOnClick() {
-        LevelManager levelManager = LevelManager.instance;
+        LevelManager levelManager = LevelManager.Instance;
         levelManager.LoadScene("main");
     }
 }
