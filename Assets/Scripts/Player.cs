@@ -151,7 +151,7 @@ public class Player : MovingObject {
     public void DisplayLife(int lifeToDisplay) {
         RemoveLife(); // barbaric suppression
         //GameObject.Finds("Heart (clone)");
-        Vector3 original = new Vector3(-0.35f, 1f) + gameObject.transform.position;
+        Vector3 original = new Vector3(-0.35f,0.75f) + gameObject.transform.position;
         for(int i=0; i < lifeToDisplay; i++) {
             Vector3 shift = new Vector3(0.35f*i, 0f);
             GameObject go = Instantiate(Heart, original + shift , Quaternion.identity);

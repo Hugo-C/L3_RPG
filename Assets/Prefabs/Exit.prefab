@@ -21,8 +21,8 @@ GameObject:
   - component: {fileID: 4000013677781948}
   - component: {fileID: 212252380699625800}
   - component: {fileID: 61020507130138538}
-  - component: {fileID: 114098064250366190}
-  m_Layer: 8
+  - component: {fileID: 114795921506497512}
+  m_Layer: 0
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +67,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &114098064250366190
+--- !u!114 &114795921506497512
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1915949630388260}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6eaf8d31e40b26c48a99e97b7b0d51eb, type: 3}
+  m_Script: {fileID: 11500000, guid: ea7cc3daad40e0849bd7d637e57b442a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!212 &212252380699625800
@@ -93,7 +93,7 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: d67d80d6c212c0c4ca7278f45c64647c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -113,7 +113,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300028, guid: 4f2d36a28e210984ebfd3aebdfa43132, type: 3}
+  m_Sprite: {fileID: 21300028, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
