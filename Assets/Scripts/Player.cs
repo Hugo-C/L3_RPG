@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MovingObject {
-    private const int AnimIdle = 0;
-    private const int AnimWalkFront = 1;
-    private const int AnimWalkRight = 2;
-    private const int AnimWalkBack = 3;
-    private const int AnimWalkLeft = 4;
     private const float MoveCoef = 0.1f;
     private const float SpellCooldown = 0.5f;
     private const float SpiralSpellCooldown = 1f;
     private const float InvunerableTime = 1f;
 
     private Animator _animator;
+    private SpriteRenderer _spriteRenderer;
     private List<string> _collidingTag;  // tag the player can collide with
 
     public GameObject Spell;
@@ -39,9 +35,11 @@ public class Player : MovingObject {
     // Use this for initialization
     protected override void Start () {
         _animator = gameObject.GetComponent<Animator>();
+        _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _collidingTag = new List<string> { "BlockingBg" };
         _spellOnCoolDown = false;
         Life = 3;
+        StartCoroutine(MakeInvunerable(InvunerableTime * 2f));
         base.Start();
     }
 	
@@ -72,17 +70,14 @@ public class Player : MovingObject {
 
     private void HandleAnimation(float horizontal, float vertical) {
         if (vertical == 0 && horizontal == 0) {
-            _animator.SetInteger("walk", AnimIdle);  // we don't have yet an idle animation
-        } else if (vertical > 0) {
-            _animator.SetInteger("walk", AnimWalkFront);
-        } else if (horizontal > 0) {
-            _animator.SetInteger("walk", AnimWalkRight);
-        } else if (vertical < 0) {
-            _animator.SetInteger("walk", AnimWalkBack);
-        } else if (horizontal < 0) {
-            _animator.SetInteger("walk", AnimWalkLeft);
+            _animator.SetBool("walking", false);  // we don't have yet an idle animation
         } else {
-            Debug.Log("error in HandleAnimation : InvalidValue");
+            _animator.SetBool("walking", true);  // we don't have yet an idle animation
+            if (horizontal > 0) {
+                _spriteRenderer.flipX = false;
+            } else if (horizontal < 0) {
+                _spriteRenderer.flipX = true;
+            }
         }
     }
 
@@ -146,6 +141,12 @@ public class Player : MovingObject {
             yield return new WaitForSeconds(InvunerableTime);
             Invulnerable = false;
         }
+    }
+
+    private IEnumerator MakeInvunerable(float delay) {  // TODO check if the player isn't already invulnerable
+        Invulnerable = true;
+        yield return new WaitForSeconds(delay);
+        Invulnerable = false;
     }
 
     public void DisplayLife(int lifeToDisplay) {

@@ -32,6 +32,7 @@ public class LevelManager : MonoBehaviour {
     /// </summary>
     /// <param name="scene">the scene to load</param>
     public void LoadScene(string scene) {
+        Cursor.visible = scene != "main";
         SceneManager.LoadScene(scene);
     }
 

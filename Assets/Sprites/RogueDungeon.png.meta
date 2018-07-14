@@ -96,10 +96,10 @@ TextureImporter:
     21300182: RogueDungeon_91
     21300184: RogueDungeon_92
     21300186: RogueDungeon_93
-    21300188: RogueDungeon_94
-    21300190: RogueDungeon_95
-    21300192: RogueDungeon_96
-    21300194: RogueDungeon_97
+    21300188: gold_1
+    21300190: gold_2
+    21300192: gold_3
+    21300194: gold_4
     21300196: RogueDungeon_98
     21300198: RogueDungeon_99
     21300200: RogueDungeon_100
@@ -2069,13 +2069,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_94
+      name: gold_1
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 32
-        width: 16
-        height: 16
+        width: 14
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2089,13 +2089,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_95
+      name: gold_2
       rect:
         serializedVersion: 2
-        x: 16
+        x: 17
         y: 32
-        width: 16
-        height: 16
+        width: 14
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2109,13 +2109,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_96
+      name: gold_3
       rect:
         serializedVersion: 2
-        x: 32
+        x: 33
         y: 32
-        width: 16
-        height: 16
+        width: 14
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -2129,13 +2129,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_97
+      name: gold_4
       rect:
         serializedVersion: 2
-        x: 48
+        x: 49
         y: 32
-        width: 16
-        height: 16
+        width: 14
+        height: 15
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
