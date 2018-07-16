@@ -466,9 +466,9 @@ public class LevelGenerator : MonoBehaviour {
                 // 1 = wall, 0 = floor
                 GameObject clone = null;
                 if (_map[x, y] == 1) {
-                    clone = Instantiate(WallPrefab, new Vector3(x, y), Quaternion.identity);
+                    clone = Instantiate(WallPrefab, new Vector3(x, y, 1f), Quaternion.identity);
                 } else if (_map[x, y] == 0) {
-                    clone = Instantiate(FloorPrefab, new Vector3(x, y), Quaternion.identity);
+                    clone = Instantiate(FloorPrefab, new Vector3(x, y, 1f), Quaternion.identity);
                 } else {
                     Debug.LogWarning("corrupted map : " + _map[x, y] + " x : " + x + " y : " + y);
                     //clone = Instantiate(FloorPrefab, new Vector3(x, y), Quaternion.identity);

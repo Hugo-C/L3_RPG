@@ -118,8 +118,8 @@ Light:
   serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0.7352742, g: 0.9433962, b: 0.734247, a: 1}
-  m_Intensity: 2
-  m_Range: 10
+  m_Intensity: 1
+  m_Range: 5
   m_SpotAngle: 30
   m_CookieSize: 10
   m_Shadows:
@@ -159,6 +159,7 @@ MonoBehaviour:
   BlockingLayer:
     serializedVersion: 2
     m_Bits: 256
+  Coin: {fileID: 1324139656532220, guid: a18679922abad8242ae30eda8fe94a24, type: 2}
 --- !u!212 &212348973530512054
 SpriteRenderer:
   m_ObjectHideFlags: 1

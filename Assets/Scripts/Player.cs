@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MovingObject {
     private const float MoveCoef = 0.1f;
@@ -12,6 +13,7 @@ public class Player : MovingObject {
     private Animator _animator;
     private SpriteRenderer _spriteRenderer;
     private List<string> _collidingTag;  // tag the player can collide with
+    private Text _coinCount;
 
     public GameObject Spell;
     public GameObject Heart;
@@ -19,7 +21,19 @@ public class Player : MovingObject {
 
     private bool _spellOnCoolDown;  // use to limit the number of cast per minute
     private bool _spiralSpellOnCoolDown;
+    private int _coins;
     private int _life;
+
+    public int Coins {
+        get {
+            return _coins;
+        }
+        
+        private set {
+            _coins = value;
+            _coinCount.text = _coins.ToString();
+        }
+    }
 
     public int Life {
         get {
@@ -37,8 +51,10 @@ public class Player : MovingObject {
         _animator = gameObject.GetComponent<Animator>();
         _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         _collidingTag = new List<string> { "BlockingBg" };
+        _coinCount = GameObject.Find("CoinCount").GetComponent<Text>();
         _spellOnCoolDown = false;
         Life = 3;
+        Coins = PlayerPrefs.GetInt("coins", 0);
         StartCoroutine(MakeInvunerable(InvunerableTime * 2f));
         base.Start();
     }
@@ -135,6 +151,8 @@ public class Player : MovingObject {
             Invulnerable = true;
             Life--;
             if(Life == 0) {
+                Coins = 0;
+                Save();
                 LevelManager levelManager = LevelManager.Instance;
                 levelManager.LoadScene("endGame");
             }
@@ -149,7 +167,15 @@ public class Player : MovingObject {
         Invulnerable = false;
     }
 
-    public void DisplayLife(int lifeToDisplay) {
+    public void PickCoin(int value) {
+        Coins += value;
+    }
+
+    public void Save() {
+        PlayerPrefs.SetInt("coins", Coins);
+    }
+    
+    private void DisplayLife(int lifeToDisplay) {
         RemoveLife(); // barbaric suppression
         //GameObject.Finds("Heart (clone)");
         Vector3 original = new Vector3(-0.35f,0.75f) + gameObject.transform.position;

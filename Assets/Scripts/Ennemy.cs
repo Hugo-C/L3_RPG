@@ -2,6 +2,8 @@
 using UnityEngine;
 
 public class Ennemy : MovingObject {
+
+    public GameObject Coin;
     private const float MoveCoef = 0.0075f;
 
     private GameObject _player;
@@ -54,6 +56,7 @@ public class Ennemy : MovingObject {
     public void Hit() {
         _life--;
         if(_life <= 0) {
+            Instantiate(Coin, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }

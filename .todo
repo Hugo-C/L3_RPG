@@ -27,6 +27,9 @@
             reduction par 2.5 (bidouille) du temps avant la destruction d us sort
         </comment>
     </note>
+    <note priority="low" time="1529437749" done="1530659249">
+        Ajouter aleatoirement des entrées aux salles ou entre les corridors
+    </note>
     <note priority="verylow" time="1523143063" done="1528215569">
         (re) supprimer les sorts qui partent trop loin
         <comment>
@@ -45,8 +48,8 @@
     <note priority="medium" time="1529436938">
         BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
     </note>
-    <note priority="low" time="1529437749" done="1530659249">
-        Ajouter aleatoirement des entrées aux salles ou entre les corridors
+    <note priority="medium" time="1531608285">
+        Ajouter un compteur de pieces
     </note>
     <note priority="verylow" time="1529441393">
         GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/
