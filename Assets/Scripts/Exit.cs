@@ -18,7 +18,8 @@ public class Exit : MonoBehaviour {
             GameObject player = GameObject.Find("Player");
             player.GetComponent<Player>().Save();
             player.SetActive(false);
-            
+
+            _levelManager.LevelCompleted += 1;
             _levelManager.LoadScene("main", 2);
         }
     }

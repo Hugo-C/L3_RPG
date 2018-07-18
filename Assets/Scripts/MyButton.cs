@@ -5,7 +5,7 @@ public abstract class MyButton : MonoBehaviour {
     private Button _button;
 
     // Use this for initialization
-    void Start () {
+    protected virtual void Start () {
         _button = GetComponent<Button>();
         _button.onClick.AddListener(TaskOnClick);
     }

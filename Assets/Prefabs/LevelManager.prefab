@@ -51,5 +51,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abe6bc79895eda64b857cce29ace4195, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  floor: {fileID: 1008569882452476, guid: 05cdd7a640bde9147b4887ee8796120b, type: 2}
-  wall: {fileID: 1352538016508906, guid: 4d969c4d1a182a744b2cb0298cfd3837, type: 2}
+  UI: {fileID: 1625099584376148, guid: fea5cd5a470c46a48b16013d87852242, type: 2}

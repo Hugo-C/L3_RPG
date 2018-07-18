@@ -12,6 +12,9 @@
             ouvre des connecteurs aléatoirements suivant un ratio
         </comment>
     </note>
+    <note priority="medium" time="1531608285" done="1531826239">
+        Ajouter un compteur de pieces
+    </note>
     <note priority="low" time="1521027495" done="1528214398">
         enlever les spells dupliqué de l'attaque en spiral
         <comment>
@@ -48,8 +51,14 @@
     <note priority="medium" time="1529436938">
         BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
     </note>
-    <note priority="medium" time="1531608285">
-        Ajouter un compteur de pieces
+    <note priority="medium" time="1531826309">
+        tests
+    </note>
+    <note priority="medium" time="1531826331">
+        ennemis avec path-finding
+    </note>
+    <note priority="medium" time="1531826344">
+        zone d'achat
     </note>
     <note priority="verylow" time="1529441393">
         GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/
