@@ -39,10 +39,7 @@ public class LevelManager : MonoBehaviour {
         //Sets this to not be destroyed when reloading scene
         DontDestroyOnLoad(gameObject);
         if (SceneManager.GetActiveScene().name == "main") {
-            if (UiInstance == null) {  // TODO regroupe ui
-                UiInstance = Instantiate(UI);
-                DontDestroyOnLoad(UiInstance);
-            }
+            InitUi();
             _levelCompletedCount = GameObject.Find("LevelCount").GetComponent<Text>();
             LevelCompleted = 0;
         }
@@ -63,10 +60,7 @@ public class LevelManager : MonoBehaviour {
     public void LoadScene(string scene) {
         if (scene == "main") {
             Cursor.visible = false;
-            if (UiInstance == null) {
-                UiInstance = Instantiate(UI);
-                DontDestroyOnLoad(UiInstance);
-            }
+            InitUi();
         } else {
             if (SceneManager.GetActiveScene().name == "main") {
                 LevelCompleted = 0;
@@ -88,6 +82,13 @@ public class LevelManager : MonoBehaviour {
         yield return new WaitForSeconds(delay);
         LoadScene(scene);
         _loading = false;
+    }
+
+    private void InitUi() {
+        if (UiInstance == null) {
+            UiInstance = Instantiate(UI);
+            DontDestroyOnLoad(UiInstance);
+        }
     }
 
     // DEBUG
