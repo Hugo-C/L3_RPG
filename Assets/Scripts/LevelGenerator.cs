@@ -20,9 +20,10 @@ public class LevelGenerator : MonoBehaviour {
     public GameObject FloorPrefab;
     public GameObject WallPrefab;
     public GameObject ExitPrefab;
-
     public GameObject PlayerPrefab;
     public GameObject EnemyPrefab;
+    public GameObject HeartDispenser;
+    public GameObject Cake;
 
     private int[,] _map;
     private MyRandom _rnd;
@@ -45,7 +46,10 @@ public class LevelGenerator : MonoBehaviour {
         for (int i = _rnd.Next(5, 10); i >= 0; i--) {
             Spawn(_map, EnemyPrefab);  // TODO : don't spawn enemy on the player
         }
-        GameObject exit = SpawnExit(_map, ExitPrefab, player);
+        SpawnExit(_map, ExitPrefab, player);
+        int level = GameObject.Find("LevelManager").GetComponent<LevelManager>().LevelCompleted;
+        if (level % 2 == 0)
+            Spawn(_map, HeartDispenser);
     }
 
     /// <summary>

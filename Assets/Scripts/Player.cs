@@ -29,7 +29,7 @@ public class Player : MovingObject {
             return _coins;
         }
         
-        private set {
+        set {
             _coins = value;
             _coinCount.text = _coins.ToString();
         }
@@ -79,9 +79,19 @@ public class Player : MovingObject {
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && !_spiralSpellOnCoolDown) {
-            Debug.Log("je cast une spirale");
             StartCoroutine(CastSpiralSpell());
         }
+
+	    if (Input.GetKeyDown(KeyCode.E)) {  // Handle interraction
+	        var interractiveGameObjects = GameObject.FindGameObjectsWithTag("Interractive");
+	        Debug.Log("nb : " + interractiveGameObjects.Length);
+	        foreach (var go in interractiveGameObjects) {
+	            if (Vector3.Distance(go.transform.position, transform.position) < 5) {
+	                var interractiveGameObject = go.GetComponent(typeof(MonoBehaviour)) as IInterractiveGameObject;
+	                interractiveGameObject?.Interract();
+	            }
+	        }
+	    }
     }
 
     private void HandleAnimation(float horizontal, float vertical) {

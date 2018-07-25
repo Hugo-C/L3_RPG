@@ -8,6 +8,7 @@ TagManager:
   - BlockingBg
   - Ennemy
   - FPS Counter
+  - Interractive
   layers:
   - Default
   - TransparentFX
