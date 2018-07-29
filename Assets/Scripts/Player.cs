@@ -53,8 +53,14 @@ public class Player : MovingObject {
         _collidingTag = new List<string> { "BlockingBg" };
         _coinCount = GameObject.Find("CoinCount").GetComponent<Text>();
         _spellOnCoolDown = false;
-        Life = 3;
-        Coins = PlayerPrefs.GetInt("coins", 0);
+        LevelManager levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        if (levelManager.LevelCompleted == 0) {
+            Life = 3;
+            Coins = 0;
+        } else {
+            Life = PlayerPrefs.GetInt("life", 3);
+            Coins = PlayerPrefs.GetInt("coins", 0);
+        }
         StartCoroutine(MakeInvunerable(InvunerableTime * 2f));
         base.Start();
     }
@@ -183,6 +189,7 @@ public class Player : MovingObject {
 
     public void Save() {
         PlayerPrefs.SetInt("coins", Coins);
+        PlayerPrefs.SetInt("life", Life);
     }
     
     private void DisplayLife(int lifeToDisplay) {
@@ -201,5 +208,11 @@ public class Player : MovingObject {
         foreach (Transform child in transform) {
             Destroy(child.gameObject);
         }
+    }
+
+    private void Reset() {
+        Life = 3;
+        Coins = 0;
+        Save();
     }
 }

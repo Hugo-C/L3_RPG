@@ -21,7 +21,7 @@ public class HeartDispenser : MonoBehaviour, IInterractiveGameObject {
 	}
 	
 	private void OnTriggerEnter2D(Collider2D other) {
-		if (other.CompareTag("Player")) {
+		if (_ready && other.CompareTag("Player")) {
 			_uiNotification.enabled = true;
 		}
 	}
@@ -44,6 +44,7 @@ public class HeartDispenser : MonoBehaviour, IInterractiveGameObject {
 			var lightComponent = GetComponent<Light>();
 			lightComponent.enabled = false;
 			_ready = false;
+			_uiNotification.enabled = false;
 		}
 		
 	}
