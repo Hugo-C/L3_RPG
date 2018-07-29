@@ -13,6 +13,7 @@ public class LevelGenerator : MonoBehaviour {
     private const int RoomSizeMax = 15;
     private const int FailMax = 25;
     private const double ConnectorRatio = 0.05;
+    private const float OverlappingMinDistance = 2f;
 
     private enum Direction { N, S, E, W }
 
@@ -23,9 +24,10 @@ public class LevelGenerator : MonoBehaviour {
     public GameObject PlayerPrefab;
     public GameObject EnemyPrefab;
     public GameObject HeartDispenser;
-    public GameObject Cake;
 
-    private int[,] _map;
+    private List<GameObject> _spawnedGameObjects;
+
+    private Tile[,] _map;
     private MyRandom _rnd;
 
     private void Awake() {
@@ -37,19 +39,20 @@ public class LevelGenerator : MonoBehaviour {
     /// <summary>
     /// Load a random dungeon level
     /// </summary>
-    void LoadLevel() {
+    public void LoadLevel() {
         GenerateMap();
         RenderMap();
-        GameObject player = Spawn(_map, PlayerPrefab);
+        _spawnedGameObjects = new List<GameObject>();
+        GameObject player = Spawn(PlayerPrefab);
         player.name = "Player";
-
+        SpawnExit(ExitPrefab, player);
         for (int i = _rnd.Next(5, 10); i >= 0; i--) {
-            Spawn(_map, EnemyPrefab);  // TODO : don't spawn enemy on the player
+            Spawn(EnemyPrefab);
         }
-        SpawnExit(_map, ExitPrefab, player);
+        
         int level = GameObject.Find("LevelManager").GetComponent<LevelManager>().LevelCompleted;
         if (level % 2 == 0)
-            Spawn(_map, HeartDispenser);
+            Spawn(HeartDispenser);
     }
 
     /// <summary>
@@ -59,16 +62,16 @@ public class LevelGenerator : MonoBehaviour {
     /// <param name="height">height of the 2D array</param>
     /// <param name="empty">if empty => the 2D array if full of 0 else full of 1</param>
     /// <returns>the 2D array generated</returns>
-    public static int[,] GenerateArray(int width, int height, bool empty) {
-        int[,] map = new int[width + 1, height + 1];
-        for (int x = 0; x < map.GetUpperBound(0); x++) {
-            for (int y = 0; y < map.GetUpperBound(1); y++) {
-                if (x == 0 || x == map.GetUpperBound(0) - 1 || y == 0 || y == map.GetUpperBound(1) - 1) {
-                    map[x, y] = 1;
+    public static Tile[,] GenerateArray(int width, int height, bool empty) {
+        Tile[,] map = new Tile[width + 1, height + 1];
+        for (int x = 0; x <= map.GetUpperBound(0); x++) {
+            for (int y = 0; y <= map.GetUpperBound(1); y++) {
+                if (x == 0 || x == map.GetUpperBound(0) || y == 0 || y == map.GetUpperBound(1)) {
+                    map[x, y] = new Tile(x, y, Type.Wall);
                 } else if (empty) {
-                    map[x, y] = 0;
+                    map[x, y] = new Tile(x, y, Type.Floor);
                 } else {
-                    map[x, y] = 1;
+                    map[x, y] = new Tile(x, y, Type.Wall);
                 }
             }
         }
@@ -86,9 +89,9 @@ public class LevelGenerator : MonoBehaviour {
 
         // then we fill walls with a maze
         GenerateMaze();
-        List<Tuple<int, int>> connectors = FindConnectors(_map);
-        Shuffle(_rnd, connectors);
-        _map = OpenConnectors(_map, connectors);
+        List<Tile> connectors = FindConnectors(_map);
+        connectors = Shuffle(_rnd, connectors);
+        OpenConnectors(connectors);
         Uncarve();  // remove dead ends
         OpenConnectorsRandom();
         Debug.Log("map generated with seed : " + _rnd.Seed);
@@ -100,7 +103,6 @@ public class LevelGenerator : MonoBehaviour {
     /// </summary>
     private void GenerateRooms() {
         int fail = 0;
-        int nbrRooms = 0;  // used to mark an area
         while (fail < FailMax) {  // stop when the last room failed to generate
             fail = 0;
             int width = _rnd.NextOdd(RoomSizeMin, RoomSizeMax);
@@ -112,11 +114,12 @@ public class LevelGenerator : MonoBehaviour {
                 if (IsMapFull(_map, x - 1, y - 1, width + 1, heigth + 1)) { // check if the area is free
                     for (int i = x; i < x + width; i++) {
                         for (int j = y; j < y + heigth; j++) {
-                            _map[i, j] = nbrRooms + 2; // area 0 and 1 are reserved
+                            _map[i, j].Type = Type.Floor;
+                            _map[i, j].Room = true;
+                            Tile.Union(_map[x, y], _map[i, j]);  // we link all tiles of a room together
                         }
                     }
                     success = true;
-                    nbrRooms++;
                 } else {
                     fail++;
                 }
@@ -133,7 +136,7 @@ public class LevelGenerator : MonoBehaviour {
     /// <param name="width">width of the rectangle</param>
     /// <param name="heigth">heigth of the rectangle</param>
     /// <returns>a boolean indicating if the map contains only wall(1) in the rectangle</returns>
-    static bool IsMapFull(int[,] map, int x, int y, int width, int heigth) {
+    static bool IsMapFull(Tile[,] map, int x, int y, int width, int heigth) {
         if (x < 0 || y < 0 || x + width > MapWidth || y + heigth > MapHeight) {
             Debug.LogWarning("PERFORMING OPERATION OUT OF THE MAP");
             return false;
@@ -142,7 +145,7 @@ public class LevelGenerator : MonoBehaviour {
         bool res = true;
         for (int i = x; i <= x + width; i++) {
             for (int j = y; j <= y + heigth; j++) {
-                if (map[i, j] != 1) {
+                if (map[i, j].Type != Type.Wall) {
                     res = false;
                 }
             }
@@ -158,9 +161,9 @@ public class LevelGenerator : MonoBehaviour {
         _map = PierceArray(_map);  // we first pierce the array with unvisited cell
         for (int x = 1; x < _map.GetUpperBound(0); x += 2) {
             for (int y = 1; y < _map.GetUpperBound(1); y += 2) {
-                if (_map[x, y] == -1) {
-                    _map[x, y] = 0;  // first cell of the maze : 0 => explored
-                    _map = CarvePassageFrom(_map, _rnd, x, y);
+                Tile t = _map[x, y];
+                if (Tile.Find(t) == t && !t.Room) {
+                    CarvePassageFrom(t);
                 }
             }
         }
@@ -172,51 +175,49 @@ public class LevelGenerator : MonoBehaviour {
     /// </summary>
     /// <param name="map">the map to transform</param>
     /// <returns>the transformed map</returns>
-    public static int[,] PierceArray(int[,] map) {
+    public static Tile[,] PierceArray(Tile[,] map) {
         for (int x = 1; x < map.GetUpperBound(0); x += 2) {
             for (int y = 1; y < map.GetUpperBound(1); y += 2) {
-                if (map[x, y] <= 1) {
-                    map[x, y] = -1; // -1 => unvisited by maze generation
-                }
+                map[x, y].Type = Type.Floor;
             }
         }
         return map;
     }
 
     /// <summary>
-    /// Try to carve a passage from the given coordinates int the map in order to expend the maze
+    /// Try to carve a passage from the given coordinates in the map in order to expend the maze
     /// </summary>
-    /// <param name="map">the map used</param>
-    /// <param name="rnd">the random genrator used</param>
-    /// <param name="x">the x coordinate</param>
-    /// <param name="y">the y coordinate</param>
+    /// <param name="origin">the starting point to carve</param>
     /// <returns>the carved map</returns>
-    private static int[,] CarvePassageFrom(int[,] map, MyRandom rnd, int x, int y) {
+    private void CarvePassageFrom(Tile origin) {
         Array directions = Enum.GetValues(typeof(Direction));
-        Shuffle<Direction>(rnd, directions);
+        directions = Shuffle(_rnd, directions);
         foreach (Direction dir in directions) {
-            Tuple<int, int> wall = Tuple.Create(x + DX(dir), y + DY(dir));
-            if (IsValidWall(map, wall, dir)) {  // open only if one of the two cells that the wall divides is visited      
-                map[wall.Item1, wall.Item2] = 0;
-                map[wall.Item1 + DX(dir), wall.Item2 + DY(dir)] = 0;
-                CarvePassageFrom(map, rnd, wall.Item1 + DX(dir), wall.Item2 + DY(dir));
+            if (0 < origin.X + 2*DX(dir) && origin.X + 2*DX(dir) < MapWidth - 1 && 0 < origin.Y + 2*DY(dir) &&
+                origin.Y + 2*DY(dir) < MapHeight - 1) {
+                Tile wall = _map[origin.X + DX(dir), origin.Y + DY(dir)];
+                Tile goal = _map[wall.X + DX(dir), wall.Y + DY(dir)];
+                if (IsValidWallForMazeExpansion(wall, origin, goal)) {
+                    // open only if one of the two cells that the wall divides is visited
+                    wall.Type = Type.Floor;
+                    Tile.Union(origin, wall);
+                    Tile.Union(origin, goal);
+                    CarvePassageFrom(goal);
+                }
             }
         }
-        return map;
     }
 
     /// <summary>
     /// Check if the wall can be carved to expend the maze
     /// </summary>
-    /// <param name="map">the map used</param>
     /// <param name="wall">the wall to test</param>
-    /// <param name="dir">the direction from where we want to carve the wall</param>
+    /// <param name="floor1"></param>
+    /// <param name="floor2"></param>
     /// <returns>boolean indicating if the wall can be carved</returns>
-    private static bool IsValidWall(int[,] map, Tuple<int, int> wall, Direction dir) {
-        if (0 < wall.Item1 && wall.Item1 < MapWidth - 1 && 0 < wall.Item2 && wall.Item2 < MapHeight - 1) {
-            return map[wall.Item1, wall.Item2] == 1 && map[wall.Item1 + DX(dir), wall.Item2 + DY(dir)] == -1; // a wall going to a place not already visited
-        }
-        return false;
+    private bool IsValidWallForMazeExpansion(Tile wall, Tile floor1, Tile floor2) {
+        return wall.IsWall() && floor1.IsFloor() && floor2.IsFloor() && !floor1.Room && !floor2.Room &&
+               Tile.Find(floor1) != Tile.Find(floor2);
     }
 
     /// <summary>
@@ -226,12 +227,12 @@ public class LevelGenerator : MonoBehaviour {
     /// </summary>
     /// <param name="map">the map where to retrieve the connector</param>
     /// <returns>a List of tuple, containing coorinates for those connectors</returns>
-    private static List<Tuple<int, int>> FindConnectors(int[,] map) {
-        var connectors = new List<Tuple<int, int>>();
+    private static List<Tile> FindConnectors(Tile[,] map) {
+        var connectors = new List<Tile>();
         for (int x = 1; x < map.GetUpperBound(0) - 1; x++) {
             for (int y = 1; y < map.GetUpperBound(1) - 1; y++) {
                 if (IsValidConnector(map, x, y)) {
-                    Tuple<int, int> connector = Tuple.Create(x, y);
+                    var connector = map[x, y];
                     connectors.Add(connector);
                 }
             }
@@ -246,10 +247,10 @@ public class LevelGenerator : MonoBehaviour {
     /// <param name="x">x coordinate of the case to check</param>
     /// <param name="y">y coordinate of the case to check</param>
     /// <returns></returns>
-    private static bool IsValidConnector(int[,] map, int x, int y) {
-        if (map[x, y] == 1) {
-            if (map[x + 1, y] != 1 && map[x - 1, y] != 1 && map[x + 1, y] != map[x - 1, y] ||
-               map[x, y + 1] != 1 && map[x, y - 1] != 1 && map[x, y + 1] != map[x, y - 1]) {
+    private static bool IsValidConnector(Tile[,] map, int x, int y) {
+        if (map[x, y].IsWall()) {
+            if (map[x + 1, y].Type == Type.Floor && map[x - 1, y].Type == Type.Floor && map[x + 1, y].Room != map[x - 1, y].Room ||
+               map[x, y + 1].Type == Type.Floor && map[x, y - 1].Type == Type.Floor && map[x, y + 1].Room != map[x, y - 1].Room) {
                 return true;
             }
         }
@@ -257,34 +258,27 @@ public class LevelGenerator : MonoBehaviour {
     }
 
     /// <summary>
-    /// Open some connectors in order to allow access to rooms
+    /// Open some connectors on the map in order to allow access to rooms
     /// </summary>
-    /// <param name="map"></param>
     /// <param name="connectors">the list of all the connectors of the map</param>
-    /// <returns>the trnsformed map</returns>
-    private static int[,] OpenConnectors(int[,] map, IEnumerable<Tuple<int, int>> connectors) {
+    private void OpenConnectors(IEnumerable<Tile> connectors) {
         foreach (var connector in connectors) {
             // First we find the direction from where the connector open to an already visited area
             Direction dir = Direction.E;
-            if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 1)
+            if (_map[connector.X + DX(dir), connector.Y + DY(dir)].IsWall() &&
+                _map[connector.X - DX(dir), connector.Y - DY(dir)].IsWall())
+                // we check both wall since previously adjacent connector might have been previously opened
                 dir = Direction.N;
-            if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] != 0)
-                dir = Oppose(dir);
 
+            Tile t1 = _map[connector.X + DX(dir), connector.Y + DY(dir)];
+            Tile t2 = _map[connector.X - DX(dir), connector.Y - DY(dir)];
             // Then we open the connector if the connector link a visited and an unvisited area
-            if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 0 &&
-                map[connector.Item1 + DX(Oppose(dir)), connector.Item2 + DY(Oppose(dir))] != 0) {
-                if (map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)] == 0) {
-                    dir = Oppose(dir);
-                }
-
-                int prevValue = map[connector.Item1 + DX(dir), connector.Item2 + DY(dir)];
-                if (prevValue > 1) {
-                    map = FloodFill(map, connector.Item1, connector.Item2, prevValue, 0);
-                }
+            if (t1.IsFloor() && t2.IsFloor() && Tile.Find(t1) != Tile.Find(t2)) {
+                Tile.Union(t1, t2);
+                connector.Type = Type.Floor;
+                Tile.Union(t1, connector);
             }
         }
-        return map;
     }
 
     /// <summary>
@@ -292,45 +286,23 @@ public class LevelGenerator : MonoBehaviour {
     /// </summary>
     /// <returns>the trnsformed map</returns>
     private void OpenConnectorsRandom() {
-        for (int x = 2; x < _map.GetUpperBound(0) - 1; x += 2) {
-            for (int y = 2; y < _map.GetUpperBound(1) - 1; y += 2) {
-                if (_map[x, y] == 1 && ((_map[x + 1, y] == 0 && _map[x + 1, y] == _map[x - 1, y]) || (_map[x, y + 1] == 0 && _map[x, y + 1] == _map[x, y - 1])) &&_rnd.NextDouble() < ConnectorRatio) {
-                    _map[x, y] = 0;
-                    //Debug.Log("random connector open @ x : " + x + ", y: " + y);
+        for (int x = 2; x < _map.GetUpperBound(0); x += 2) {
+            for (int y = 2; y < _map.GetUpperBound(1); y += 2) {
+                if (_map[x, y].IsWall() && IsValidConnector(_map, x, y) && _rnd.NextDouble() < ConnectorRatio) {
+                    _map[x, y].Type = Type.Floor;
                 }
             }
         }
     }
 
     /// <summary>
-    /// Change the given coordinate to currentValue and try to change adjacent case of prevValue to currentValue
-    /// </summary>
-    /// <param name="map"></param>
-    /// <param name="x">x coordinate of the case to set to currentvalue and from where floodfill will spread</param>
-    /// <param name="y">y coordinate of the case to set to currentvalue and from where floodfill will spread</param>
-    /// <param name="prevValue">the value used to spread floodfill</param>
-    /// <param name="currentValue">the value spread by floodfill on adjacent case of value prevValue</param>
-    /// <returns>the transformed map</returns>
-    private static int[,] FloodFill(int[,] map, int x, int y, int prevValue, int currentValue) {
-        map[x, y] = currentValue;
-        Array directions = Enum.GetValues(typeof(Direction));
-        foreach (Direction dir in directions) {
-            if (x + DX(dir) > 0 && x + DX(dir) < map.GetUpperBound(0) && y + DY(dir) > 0 && y + DY(dir) < map.GetUpperBound(1) && map[x + DX(dir), y + DY(dir)] == prevValue) {
-                map = FloodFill(map, x + DX(dir), y + DY(dir), prevValue, currentValue);
-            }
-        }
-        return map;
-    }
-
-    /// <summary>
     /// Replace dead ends by walls
     /// </summary>
     private void Uncarve() {
-        for (int x = 1; x < _map.GetUpperBound(0) - 1; x++) {
-            for (int y = 1; y < _map.GetUpperBound(1) - 1; y++) {
-                // Check if it's a dead end
-                if (IsDeadEnd(_map, x, y)) {
-                    _map = UncarveDeadEnd(_map, x, y);
+        for (int x = 1; x < _map.GetUpperBound(0); x++) {
+            for (int y = 1; y < _map.GetUpperBound(1); y++) {
+                if (IsDeadEnd(x, y)) {
+                    UncarveDeadEnd(x, y);
                 }
             }
         }
@@ -339,21 +311,22 @@ public class LevelGenerator : MonoBehaviour {
     /// <summary>
     /// Uncarve a dead end starting from the given coordinates
     /// </summary>
-    /// <param name="map"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns>the transformed map</returns>
-    private static int[,] UncarveDeadEnd(int[,] map, int x, int y) {
-        map[x, y] = 1;  // fill the dead end with wall
+    private void UncarveDeadEnd(int x, int y) {
+        _map[x, y].Type = Type.Wall;  // fill the dead end with wall
         // then we look if an adjacent case is a dead end
         Array directions = Enum.GetValues(typeof(Direction));
         foreach (Direction dir in directions) {
-            if (x + DX(dir) > 0 && x + DX(dir) < map.GetUpperBound(0) && y + DY(dir) > 0 && y + DY(dir) < map.GetUpperBound(1) && IsDeadEnd(map, x + DX(dir), y + DY(dir))) {
-                map = UncarveDeadEnd(map, x + DX(dir), y + DY(dir));
-                break;  // there can be only one adjacent dead end (since the previous case was a dead end) 
+            int x2 = x + DX(dir);
+            int y2 = y + DY(dir);
+            if (x2 > 0 && x2 < _map.GetUpperBound(0) && y2 > 0 && y2 < _map.GetUpperBound(1) &&
+                IsDeadEnd(x2, y2)) {
+                UncarveDeadEnd(x2, y2);
+                break; // there can be only one adjacent dead end (since the previous tile was a dead end) 
             }
         }
-        return map;
     }
 
     /// <summary>
@@ -361,12 +334,25 @@ public class LevelGenerator : MonoBehaviour {
     /// 
     /// a dead end is a floor with three or more adjacent walls
     /// </summary>
-    /// <param name="map"></param>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    private static bool IsDeadEnd(int[,] map, int x, int y) {
-        return map[x, y] == 0 && map[x - 1, y] + map[x + 1, y] + map[x, y - 1] + map[x, y + 1] >= 3;
+    private bool IsDeadEnd(int x, int y) {
+        if (_map[x, y].Room)
+            return false;
+        try {
+            int nbAdjacentWall = NbAdjacentWall(x, y);
+            return _map[x, y].IsFloor() && nbAdjacentWall >= 3;
+        }
+        catch (Exception e) {
+            Debug.LogWarning("error in isdeadend, x : " + x + ", y : " + y + " " + e.Message);
+            return false;
+        }
+    }
+
+    private int NbAdjacentWall(int x, int y) {
+        return (_map[x - 1, y].IsWall()? 1 : 0) + (_map[x + 1, y].IsWall()? 1 : 0) +
+            (_map[x, y - 1].IsWall()? 1 : 0) + (_map[x, y + 1].IsWall()? 1 : 0);
     }
 
     /// <summary>
@@ -411,36 +397,20 @@ public class LevelGenerator : MonoBehaviour {
         }
     }
 
-    private static Direction Oppose(Direction d) {
-        switch (d) {
-            case Direction.E:
-                return Direction.W;
-            case Direction.W:
-                return Direction.E;
-            case Direction.N:
-                return Direction.S;
-            case Direction.S:
-                return Direction.N;
-            default:
-                Debug.LogWarning("ERROR : NOT A DIRECTION");
-                return 0;
-        }
-    }
-
     /// <summary>
     /// Shuffle the array
     /// </summary>
-    /// <typeparam name="T">the type of the elements in the array</typeparam>
     /// <param name="rng">the random generator used</param>
     /// <param name="array">the array to shuffle</param>
-    public static void Shuffle<T>(MyRandom rng, System.Array array) {  // TODO : return tab ?
+    public static Array Shuffle(MyRandom rng, Array array) {
         int n = array.Length;
         while (n > 1) {
             int k = rng.Next(n--);
-            T tmp = (T)array.GetValue(n);
+            var tmp = array.GetValue(n);
             array.SetValue(array.GetValue(k), n);
             array.SetValue(tmp, k);
         }
+        return array;
     }
 
     /// <summary>
@@ -449,7 +419,7 @@ public class LevelGenerator : MonoBehaviour {
     /// <typeparam name="T">the type of the elements in the list</typeparam>
     /// <param name="rng">the random generator used</param>
     /// <param name="list">the list to shuffle</param>
-    public static void Shuffle<T>(MyRandom rng, List<T> list) {
+    public static List<T> Shuffle<T>(MyRandom rng, List<T> list) {
         int n = list.Count;
         while (n > 1) {
             int k = rng.Next(n--);
@@ -457,6 +427,7 @@ public class LevelGenerator : MonoBehaviour {
             list[n] = list[k];
             list[k] = tmp;
         }
+        return list;
     }
 
     /// <summary>
@@ -469,9 +440,9 @@ public class LevelGenerator : MonoBehaviour {
             for (int y = 0; y < _map.GetUpperBound(1); y++) {
                 // 1 = wall, 0 = floor
                 GameObject clone = null;
-                if (_map[x, y] == 1) {
+                if (_map[x, y].IsWall()) {
                     clone = Instantiate(WallPrefab, new Vector3(x, y, 1f), Quaternion.identity);
-                } else if (_map[x, y] == 0) {
+                } else if (_map[x, y].IsFloor()) {
                     clone = Instantiate(FloorPrefab, new Vector3(x, y, 1f), Quaternion.identity);
                 } else {
                     Debug.LogWarning("corrupted map : " + _map[x, y] + " x : " + x + " y : " + y);
@@ -488,42 +459,74 @@ public class LevelGenerator : MonoBehaviour {
     /// 
     /// a clear area is a floor case with 4 adjacent floors
     /// </summary>
-    /// <param name="map"></param>
     /// <param name="go">the gameObject to spawn</param>
     /// <returns>a clone of the gameObject, who spawned in the map</returns>
-    public GameObject Spawn(int[,] map, GameObject go) {
+    public GameObject Spawn(GameObject go) {
         int x, y;
+        bool overlapping;
+        // find a spot with only floor around
         do {
-            x = _rnd.Next(1, map.GetUpperBound(0));
-            y = _rnd.Next(1, map.GetUpperBound(1));
-        } while (map[x, y] + map[x + 1, y] + map[x - 1, y] + map[x, y + 1] + map[x, y - 1] != 0);
-        return Instantiate(go, new Vector2(x, y), Quaternion.identity);
+            x = _rnd.Next(1, _map.GetUpperBound(0));
+            y = _rnd.Next(1, _map.GetUpperBound(1));
+
+            var closestGameObject = ClosestGameObject(x, y);
+            if (closestGameObject == null) { // there isn't even a gameobject to overlap
+                overlapping = false;
+            } else {
+                overlapping = Vector2.Distance(closestGameObject.transform.position, new Vector2(x, y)) < OverlappingMinDistance;
+            }
+        } while (_map[x, y].IsWall() || !_map[x, y].Room || NbAdjacentWall(x, y) > 0 || overlapping);
+
+        var clone = Instantiate(go, new Vector2(x, y), Quaternion.identity);
+        _spawnedGameObjects.Add(clone);
+        return clone;
     }
+
+    /// <summary>
+    /// Find the closest gameobject, from previously spawned gameobject, to a point
+    /// </summary>
+    /// <param name="x">the x coordinates of the point</param>
+    /// <param name="y">the y coordinates of the point</param>
+    /// <returns>the closest gameobject or null if no gameobjects were previously placed</returns>
+    private GameObject ClosestGameObject(int x, int y) {
+        if (_spawnedGameObjects.Count == 0)
+            return null;
+        
+        Vector2 position = new Vector2(x, y);
+        GameObject res = _spawnedGameObjects[0];
+        float minDistance = Vector2.Distance(position, res.transform.position);
+        foreach (var go in _spawnedGameObjects) {
+            float tmp = Vector2.Distance(position, go.transform.position);
+            if (tmp < minDistance) {
+                minDistance = tmp;
+                res = go;
+            }
+        }
+        return res;
+    }
+    
 
     /// <summary>
     /// Spawn a GameObject int the map at a clear area
     /// 
     /// a clear area is a floor case with 4 adjacent floors
     /// </summary>
-    /// <param name="map2"></param>
     /// <param name="exit">the gameObject to spawn</param>
     /// <param name="player">the gameobject of a player, used to spawn the exit a bit far from him</param>
     /// <returns>a clone of the gameObject, who spawned in the map</returns>
-    private GameObject SpawnExit(int[,] map2, GameObject exit, GameObject player) {
+    private GameObject SpawnExit(GameObject exit, GameObject player) {
         float minDistance = new Vector2(MapWidth, MapHeight).magnitude / 2f;
-        int x, y;
-        Vector2 position;
+        GameObject exitClone = null;
         int nbTry = 0;
         do {
+            if(exitClone != null)
+                Destroy(exitClone);
             nbTry++;
-            if (nbTry % 10 == 0) {
-                minDistance--;  // minDistance is reduced to allow small maps
+            if (nbTry % 5 == 0) {
+                minDistance--; // minDistance is reduced to allow small maps
             }
-            x = _rnd.Next(1, map2.GetUpperBound(0));
-            y = _rnd.Next(1, map2.GetUpperBound(1));
-            position = new Vector2(x, y);
-        } while (map2[x, y] + map2[x + 1, y] + map2[x - 1, y] + map2[x, y + 1] + map2[x, y - 1] != 0 ||
-                 Vector2.Distance(position, player.transform.position) < minDistance);
-        return Instantiate(exit, position, Quaternion.identity);
+            exitClone = Spawn(exit);
+        } while(Vector2.Distance(exitClone.transform.position, player.transform.position) < minDistance);
+        return exitClone;
     }
 }
