@@ -12,6 +12,12 @@
             ouvre des connecteurs aléatoirements suivant un ratio
         </comment>
     </note>
+    <note priority="medium" time="1529436938" done="1532895128">
+        BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
+        <comment>
+            utilisation d'une structure de donnée différente : d'union-find
+        </comment>
+    </note>
     <note priority="medium" time="1531608285" done="1531826239">
         Ajouter un compteur de pieces
     </note>
@@ -48,12 +54,6 @@
     <note priority="high" time="1529440172">
         arreter d'avoir que des methodes statics =&gt; utiliser map comme un attribut
     </note>
-    <note priority="medium" time="1529436938" done="1532895128">
-        BUG : piece qui s'ouvre l'une sur l'autre x2, seed : 775320044 taille : 101*61
-        <comment>
-            utilisation d'une structure de donnée différente : d'union-find
-        </comment>
-    </note>
     <note priority="medium" time="1531826309">
         tests
     </note>
@@ -62,6 +62,12 @@
     </note>
     <note priority="medium" time="1531826344">
         zone d'achat
+    </note>
+    <note priority="medium" time="1533548124">
+        ajuster les touches de contrôles affichés aux touches rentrées dans le keymap d'unity
+    </note>
+    <note priority="low" time="1533585699">
+        Eviter que tous les ennemis commencent leurs animations au même moments
     </note>
     <note priority="verylow" time="1529441393">
         GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/

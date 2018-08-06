@@ -8,15 +8,15 @@ Prefab:
     m_TransformParent: {fileID: 0}
     m_Modifications: []
     m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 0}
+  m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1311073727172424}
-  m_IsPrefabParent: 1
+  m_IsPrefabAsset: 1
 --- !u!1 &1311073727172424
 GameObject:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 5
+  serializedVersion: 6
   m_Component:
   - component: {fileID: 4298163160869194}
   - component: {fileID: 114129527739010570}
@@ -30,7 +30,7 @@ GameObject:
 --- !u!4 &4298163160869194
 Transform:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1311073727172424}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -43,7 +43,7 @@ Transform:
 --- !u!114 &114129527739010570
 MonoBehaviour:
   m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1311073727172424}
   m_Enabled: 1
@@ -54,9 +54,49 @@ MonoBehaviour:
   FloorPrefab: {fileID: 1008569882452476, guid: 05cdd7a640bde9147b4887ee8796120b,
     type: 2}
   WallPrefab: {fileID: 1352538016508906, guid: 4d969c4d1a182a744b2cb0298cfd3837, type: 2}
+  FloorSprites:
+  - {fileID: 21300000, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300016, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300032, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  WallSprites:
+  - {fileID: 21300048, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300050, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300052, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300054, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300056, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300064, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300066, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300068, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300070, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300072, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300080, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300082, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300084, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300090, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300092, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300094, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300096, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300098, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300100, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300102, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300108, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300110, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300112, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300114, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300124, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300126, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300128, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300130, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300132, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300136, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300140, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300142, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300144, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
+  - {fileID: 21300146, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
   ExitPrefab: {fileID: 1915949630388260, guid: 779bccdb78d3d7540a29df38e08f0098, type: 2}
   PlayerPrefab: {fileID: 1497416077000598, guid: f1ae10028ec1edf41aa89febe7737c3b,
     type: 2}
   EnemyPrefab: {fileID: 1497416077000598, guid: 47ee2485f1c935c47af42b8a45982edd,
     type: 2}
-  HeartDispenser: {fileID: 0}
+  HeartDispenser: {fileID: 1167504046434544, guid: 5203036d258513740abcb25369edc4c3,
+    type: 2}

@@ -20,21 +20,25 @@ public class LevelGenerator : MonoBehaviour {
 
     public GameObject FloorPrefab;
     public GameObject WallPrefab;
+    public Sprite[] FloorSprites;
+    public Sprite[] WallSprites;
     public GameObject ExitPrefab;
     public GameObject PlayerPrefab;
     public GameObject EnemyPrefab;
     public GameObject HeartDispenser;
 
     private List<GameObject> _spawnedGameObjects;
-
     private Tile[,] _map;
     private MyRandom _rnd;
 
     private void Awake() {
         _rnd = new MyRandom();
+        var sw = new System.Diagnostics.Stopwatch();
+        sw.Start();
         LoadLevel();
+        sw.Stop();
+        Debug.Log("level loaded in " + sw.ElapsedMilliseconds + " ms");
     }
-
 
     /// <summary>
     /// Load a random dungeon level
@@ -435,15 +439,15 @@ public class LevelGenerator : MonoBehaviour {
     /// </summary>
     private void RenderMap() {
         //Loop through the width of the map
-        for (int x = 0; x < _map.GetUpperBound(0); x++) {
+        for (int x = 0; x <= _map.GetUpperBound(0); x++) {
             //Loop through the height of the map
-            for (int y = 0; y < _map.GetUpperBound(1); y++) {
+            for (int y = 0; y <= _map.GetUpperBound(1); y++) {
                 // 1 = wall, 0 = floor
                 GameObject clone = null;
                 if (_map[x, y].IsWall()) {
-                    clone = Instantiate(WallPrefab, new Vector3(x, y, 1f), Quaternion.identity);
+                    clone = RenderWall(x, y);
                 } else if (_map[x, y].IsFloor()) {
-                    clone = Instantiate(FloorPrefab, new Vector3(x, y, 1f), Quaternion.identity);
+                    clone = RenderFloor(x, y);
                 } else {
                     Debug.LogWarning("corrupted map : " + _map[x, y] + " x : " + x + " y : " + y);
                     //clone = Instantiate(FloorPrefab, new Vector3(x, y), Quaternion.identity);
@@ -452,6 +456,216 @@ public class LevelGenerator : MonoBehaviour {
                     clone.transform.parent = gameObject.transform; // organize the editor view
             }
         }
+    }
+
+    /// <summary>
+    /// Convert a grid (9  tiles around x and y coordinates) of the map to the correspondant short
+    /// </summary>
+    /// <param name="x">x coordinate of the tile in the center of the grid</param>
+    /// <param name="y">y coordinate of the tile in the center of the grid</param>
+    /// <returns></returns>
+    private short GridSerialisation(int x, int y) {
+        short res = 0;
+        int cmpt = 0;
+        //for (int x = 0 + xShift; x < 3 + xShift; x++) { // OLD
+            //for (int y = 2 + yShift; y >= 0 + yShift; y--) {
+        for(int j = y - 1; j <= y + 1; j++){ // TODO FIXME new
+            for(int i = x + 1; i >= x - 1; i--){
+                if (i >= 0 && i <= _map.GetUpperBound(0) && j >= 0 && j <= _map.GetUpperBound(1))
+                    res |= (short) ((_map[i, j].IsWall() ? 1 : 0) << cmpt);
+                // if the x,y coordinates are outside the map, it is considered as a floor (0) 
+                cmpt++;
+            }
+        }
+        return res;
+    }
+
+    private GameObject RenderWall(int x, int y) {
+        GameObject clone = Instantiate(WallPrefab, new Vector3(x, y, 1f), Quaternion.identity);
+        Sprite sprite = null;
+        var gridCode = GridSerialisation(x, y);
+        switch (gridCode) {
+            case 27: //0B110110000
+            case 31: //0B11111
+            case 91: //0B1011011
+                sprite = WallSprites[0];
+                break;
+            case 63: //0B000111111
+            case 319: //0B100111111
+            case 127: //0B01111111
+            case 62: //0B111110
+            case 59: //0B111011  // TODO FIXEME
+            case 191: //0B10111111  // TODO FIXME
+            case 123: //0B1111011  // TODO FIXME
+                sprite = WallSprites[1];
+                break;
+            case 54: //0B000110110
+            case 310: //0B100110110
+            case 55: //0B110111
+                sprite = WallSprites[2];
+                break;
+            case 510: //0B111111110
+                sprite = WallSprites[3];
+                break;
+            case 507: //0B111111011
+                sprite = WallSprites[4];
+                break;
+            case 219: //0B011011011
+            case 475: //0B111011011
+            case 223: //0B11011111
+            case 218: //0B11011010  // TODO FIXME
+            case 251: //0B11111011  // TODO FIXME
+            case 155: //0B010011011  // TODO FIXME
+                sprite = WallSprites[5];
+                break;
+            case 511: //0B111111111
+                sprite = WallSprites[6];
+                break;       
+            case 438: //0B110110110
+            case 439: //0B110110111
+            case 502: //0B111110110
+            case 446: //0B110111110 // TODO FIXME
+            case 182: //0B10110110 // TODO FIXME
+            case 434: //0B110110010  // TODO FIXME
+                sprite = WallSprites[7];
+                break;
+            case 447: //0B110111111
+                sprite = WallSprites[8];
+                break;
+            case 255: //0B011111111
+                sprite = WallSprites[9];
+                break;
+            case 216: //0B011011000
+                sprite = WallSprites[10];
+                break;
+            case 504: //0B111111000
+            case 508: //0B111111100 // TODO FIXME
+            case 440: //0B110111000 // TODO FIXME
+            case 248: //0B11111000 // TODO FIXME
+            case 505: //0B111111001 // TODO FIXME
+            case 506: //0B111111010  // TODO FIXME
+                sprite = WallSprites[11];
+                break;
+            case 432: //0B110110000
+            case 436: //0B110110100
+            case 496: //0B111110000
+                sprite = WallSprites[12];
+                break;
+            case 48: //0B000110000
+            case 308: //0B100110100
+            case 304: //0B100110000
+            case 52: //0B110100  // TODO FIXME
+                if (_rnd.NextDouble() >= 0.5) {
+                    sprite = WallSprites[13];
+                } else {
+                    sprite = WallSprites[21];
+                }
+                break;
+            case 24: //0B000011000
+            case 25: //0B11001
+            case 88: //0B1011000
+            case 89: //0B1011001  // TODO FIXME
+                if (_rnd.NextDouble() >= 0.5) {
+                    sprite = WallSprites[14];
+                } else {
+                    sprite = WallSprites[22];
+                }
+                break;
+            case 26: //0B000011010
+                sprite = WallSprites[15];
+                break;
+            case 186: //0B010111010
+                sprite = WallSprites[16];
+                break;
+            case 56: //0B000111000
+            case 312: //0B100111000
+            case 316: //0B100111100
+            case 121: //0B1111001
+            case 120: //0B1111000
+            case 60: //0B111100
+            case 313: //0B100111001
+            case 57: //0B111001
+            case 124: //0B1111100 // TODO FIXME
+                sprite = WallSprites[17];
+                break;
+            case 50: //0B000110010
+                sprite = WallSprites[18];
+                break;
+            case 16: //0B000010000
+                sprite = WallSprites[19];
+                break;
+            case 154: //0B010011010
+                sprite = WallSprites[20];
+                break;
+            case 178: //0B010110010  TODO
+                sprite = WallSprites[23];
+                break;
+            case 146: //0B010010010
+            case 466: //0B111010010
+            case 147: //0B10010011
+            case 210: //0B11010010
+            case 402: //0B110010010
+            case 403: //0B110010011
+            case 150: //0B10010110
+            case 214: //0B11010110
+            case 151: //0B10010111
+                if (_rnd.NextDouble() >= 0.1) {
+                    sprite = WallSprites[24];
+                } else { 
+                    sprite = WallSprites[27];  // broken wall
+                }
+                break;
+            case 18: //0B000010010
+            case 19: //0B10011
+            case 22: //0B10110
+            case 23: //0B10111
+                sprite = WallSprites[25];
+                break;
+            case 58: //0B000111010
+                sprite = WallSprites[26];
+                break;
+            case 152: //0B010011000
+                sprite = WallSprites[30];
+                break;
+            case 184: //0B010111000
+                sprite = WallSprites[31];
+                break;
+            case 464: //0B111010000
+            case 144: //0B10010000
+            case 400: //0B110010000
+            case 208: //0B11010000
+                sprite = WallSprites[32];
+                break;
+            case 176: //0B010110000
+                sprite = WallSprites[33];
+                break;
+            default :
+                Debug.LogWarning("unknown configuration for wall @" + x + ", " + y + " with code : " + Convert.ToString(gridCode, 2));
+                //sprite = WallSprites[19];
+                break;
+        }
+
+        if (sprite != null)
+            clone.GetComponent<SpriteRenderer>().sprite = sprite;
+        return clone;
+    }
+
+    private GameObject RenderFloor(int x, int y) {
+        GameObject clone = Instantiate(FloorPrefab, new Vector3(x, y, 1f), Quaternion.identity);
+        SpriteRenderer sr = clone.GetComponent<SpriteRenderer>();
+        double p = _rnd.NextDouble();
+        if (p > 0.8) {  // change the default sprite to a dammaged one
+            if (p > 0.95) {
+                sr.sprite = FloorSprites[2];
+            } else {
+                sr.sprite = clone.GetComponent<SpriteRenderer>().sprite = FloorSprites[1];
+            }
+            // we bring some diversity by flipping asset
+            //sr.flipX = _rnd.NextDouble() > 0.5;
+            //sr.flipY = _rnd.NextDouble() > 0.5;
+        }
+        
+        return clone;
     }
 
     /// <summary>
@@ -464,6 +678,7 @@ public class LevelGenerator : MonoBehaviour {
     public GameObject Spawn(GameObject go) {
         int x, y;
         bool overlapping;
+        int cmpt = 0;  // help reduce overlapping distance by 1% after each fail
         // find a spot with only floor around
         do {
             x = _rnd.Next(1, _map.GetUpperBound(0));
@@ -473,8 +688,10 @@ public class LevelGenerator : MonoBehaviour {
             if (closestGameObject == null) { // there isn't even a gameobject to overlap
                 overlapping = false;
             } else {
-                overlapping = Vector2.Distance(closestGameObject.transform.position, new Vector2(x, y)) < OverlappingMinDistance;
+                overlapping = Vector2.Distance(closestGameObject.transform.position, new Vector2(x, y)) <
+                              OverlappingMinDistance - (OverlappingMinDistance * 0.01f * cmpt);
             }
+            cmpt++;
         } while (_map[x, y].IsWall() || !_map[x, y].Room || NbAdjacentWall(x, y) > 0 || overlapping);
 
         var clone = Instantiate(go, new Vector2(x, y), Quaternion.identity);

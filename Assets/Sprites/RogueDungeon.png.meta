@@ -26,56 +26,56 @@ TextureImporter:
     21300042: RogueDungeon_21
     21300044: RogueDungeon_22
     21300046: RogueDungeon_23
-    21300048: RogueDungeon_24
-    21300050: RogueDungeon_25
-    21300052: RogueDungeon_26
-    21300054: RogueDungeon_27
-    21300056: RogueDungeon_28
+    21300048: wall_1
+    21300050: wall_2
+    21300052: wall_3
+    21300054: wall_4
+    21300056: wall_5
     21300058: RogueDungeon_29
     21300060: RogueDungeon_30
     21300062: RogueDungeon_31
-    21300064: RogueDungeon_32
-    21300066: RogueDungeon_33
-    21300068: RogueDungeon_34
-    21300070: RogueDungeon_35
-    21300072: RogueDungeon_36
+    21300064: wall_6
+    21300066: wall_7
+    21300068: wall_8
+    21300070: wall_9
+    21300072: wall_10
     21300074: RogueDungeon_37
     21300076: RogueDungeon_38
     21300078: RogueDungeon_39
-    21300080: RogueDungeon_40
-    21300082: RogueDungeon_41
-    21300084: RogueDungeon_42
+    21300080: wall_11
+    21300082: wall_12
+    21300084: wall_13
     21300086: RogueDungeon_43
     21300088: RogueDungeon_44
-    21300090: RogueDungeon_45
-    21300092: RogueDungeon_46
-    21300094: RogueDungeon_47
-    21300096: RogueDungeon_48
-    21300098: RogueDungeon_49
-    21300100: RogueDungeon_50
-    21300102: RogueDungeon_51
+    21300090: wall_14
+    21300092: wall_15
+    21300094: wall_16
+    21300096: wall_17
+    21300098: wall_18
+    21300100: wall_19
+    21300102: wall_20
     21300104: RogueDungeon_52
     21300106: RogueDungeon_53
-    21300108: RogueDungeon_54
-    21300110: RogueDungeon_55
-    21300112: RogueDungeon_56
-    21300114: RogueDungeon_57
+    21300108: wall_21
+    21300110: wall_22
+    21300112: wall_23
+    21300114: wall_24
     21300116: RogueDungeon_58
     21300118: RogueDungeon_59
     21300120: RogueDungeon_60
     21300122: RogueDungeon_61
-    21300124: RogueDungeon_62
-    21300126: RogueDungeon_63
-    21300128: RogueDungeon_64
-    21300130: RogueDungeon_65
-    21300132: RogueDungeon_66
+    21300124: wall_25
+    21300126: wall_26
+    21300128: wall_27
+    21300130: wall_28
+    21300132: wall_29
     21300134: RogueDungeon_67
-    21300136: RogueDungeon_68
+    21300136: wall_30
     21300138: RogueDungeon_69
-    21300140: RogueDungeon_70
-    21300142: RogueDungeon_71
-    21300144: RogueDungeon_72
-    21300146: RogueDungeon_73
+    21300140: wall_31
+    21300142: wall_32
+    21300144: wall_33
+    21300146: wall_34
     21300148: RogueDungeon_74
     21300150: RogueDungeon_75
     21300152: RogueDungeon_76
@@ -110,7 +110,7 @@ TextureImporter:
     21300210: RogueDungeon_105
     21300212: RogueDungeon_106
   externalObjects: {}
-  serializedVersion: 5
+  serializedVersion: 7
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -128,6 +128,8 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
   isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -138,7 +140,7 @@ TextureImporter:
     serializedVersion: 2
     filterMode: -1
     aniso: -1
-    mipBias: -1
+    mipBias: -100
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -669,7 +671,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_24
+      name: wall_1
       rect:
         serializedVersion: 2
         x: 0
@@ -689,7 +691,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_25
+      name: wall_2
       rect:
         serializedVersion: 2
         x: 16
@@ -709,7 +711,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_26
+      name: wall_3
       rect:
         serializedVersion: 2
         x: 32
@@ -729,7 +731,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_27
+      name: wall_4
       rect:
         serializedVersion: 2
         x: 48
@@ -749,7 +751,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_28
+      name: wall_5
       rect:
         serializedVersion: 2
         x: 64
@@ -829,7 +831,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_32
+      name: wall_6
       rect:
         serializedVersion: 2
         x: 0
@@ -849,7 +851,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_33
+      name: wall_7
       rect:
         serializedVersion: 2
         x: 16
@@ -869,7 +871,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_34
+      name: wall_8
       rect:
         serializedVersion: 2
         x: 32
@@ -889,7 +891,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_35
+      name: wall_9
       rect:
         serializedVersion: 2
         x: 48
@@ -909,7 +911,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_36
+      name: wall_10
       rect:
         serializedVersion: 2
         x: 64
@@ -989,7 +991,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_40
+      name: wall_11
       rect:
         serializedVersion: 2
         x: 0
@@ -1009,7 +1011,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_41
+      name: wall_12
       rect:
         serializedVersion: 2
         x: 16
@@ -1029,7 +1031,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_42
+      name: wall_13
       rect:
         serializedVersion: 2
         x: 32
@@ -1089,7 +1091,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_45
+      name: wall_14
       rect:
         serializedVersion: 2
         x: 80
@@ -1109,7 +1111,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_46
+      name: wall_15
       rect:
         serializedVersion: 2
         x: 112
@@ -1129,7 +1131,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_47
+      name: wall_16
       rect:
         serializedVersion: 2
         x: 0
@@ -1149,7 +1151,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_48
+      name: wall_17
       rect:
         serializedVersion: 2
         x: 16
@@ -1169,7 +1171,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_49
+      name: wall_18
       rect:
         serializedVersion: 2
         x: 32
@@ -1189,7 +1191,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_50
+      name: wall_19
       rect:
         serializedVersion: 2
         x: 48
@@ -1209,7 +1211,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_51
+      name: wall_20
       rect:
         serializedVersion: 2
         x: 64
@@ -1269,7 +1271,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_54
+      name: wall_21
       rect:
         serializedVersion: 2
         x: 0
@@ -1289,7 +1291,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_55
+      name: wall_22
       rect:
         serializedVersion: 2
         x: 16
@@ -1309,7 +1311,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_56
+      name: wall_23
       rect:
         serializedVersion: 2
         x: 32
@@ -1329,7 +1331,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_57
+      name: wall_24
       rect:
         serializedVersion: 2
         x: 48
@@ -1429,7 +1431,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_62
+      name: wall_25
       rect:
         serializedVersion: 2
         x: 0
@@ -1449,7 +1451,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_63
+      name: wall_26
       rect:
         serializedVersion: 2
         x: 16
@@ -1469,7 +1471,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_64
+      name: wall_27
       rect:
         serializedVersion: 2
         x: 32
@@ -1489,7 +1491,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_65
+      name: wall_28
       rect:
         serializedVersion: 2
         x: 48
@@ -1509,7 +1511,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_66
+      name: wall_29
       rect:
         serializedVersion: 2
         x: 64
@@ -1549,7 +1551,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_68
+      name: wall_30
       rect:
         serializedVersion: 2
         x: 96
@@ -1589,7 +1591,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_70
+      name: wall_31
       rect:
         serializedVersion: 2
         x: 0
@@ -1609,7 +1611,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_71
+      name: wall_32
       rect:
         serializedVersion: 2
         x: 16
@@ -1629,7 +1631,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_72
+      name: wall_33
       rect:
         serializedVersion: 2
         x: 32
@@ -1649,7 +1651,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: RogueDungeon_73
+      name: wall_34
       rect:
         serializedVersion: 2
         x: 48
@@ -2337,6 +2339,8 @@ TextureImporter:
     edges: []
     weights: []
   spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
