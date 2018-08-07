@@ -17,6 +17,10 @@ public class Ennemy : MovingObject {
         _player = GameObject.Find("Player");
         _life = 2;
         _collidingTag = new List<string> { "Player", "BlockingBg" };
+        var animator = gameObject.GetComponent<Animator>();
+        MyRandom rnd = new MyRandom();
+        AnimatorStateInfo asi = animator.GetCurrentAnimatorStateInfo(0);
+        animator.Update(asi.length / (float)rnd.NextDouble());
         base.Start();
 	}
 	

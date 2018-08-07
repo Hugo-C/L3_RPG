@@ -66,8 +66,11 @@
     <note priority="medium" time="1533548124">
         ajuster les touches de contrôles affichés aux touches rentrées dans le keymap d'unity
     </note>
-    <note priority="low" time="1533585699">
+    <note priority="low" time="1533585699" done="1533635107">
         Eviter que tous les ennemis commencent leurs animations au même moments
+        <comment>
+            utilisation de la méthode Animator.Update()
+        </comment>
     </note>
     <note priority="verylow" time="1529441393">
         GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/

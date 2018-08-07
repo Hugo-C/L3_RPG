@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class HeartDispenser : MonoBehaviour, IInterractiveGameObject {
 
+	public Sprite DisabledSprite;
+
 	private Image _uiNotification;
 	private bool _ready;  // TODO : add to the interface
 	private const int Cost = 3;
@@ -41,8 +43,9 @@ public class HeartDispenser : MonoBehaviour, IInterractiveGameObject {
 			player.Coins -= Cost;
 			player.Life++;
 			
-			var lightComponent = GetComponent<Light>();
+			var lightComponent = transform.GetComponentInChildren<Light>();
 			lightComponent.enabled = false;
+			gameObject.GetComponent<SpriteRenderer>().sprite = DisabledSprite;
 			_ready = false;
 			_uiNotification.enabled = false;
 		}

@@ -11,6 +11,22 @@ Prefab:
   m_SourcePrefab: {fileID: 0}
   m_RootGameObject: {fileID: 1746701534414868}
   m_IsPrefabAsset: 1
+--- !u!1 &1579560948563928
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4283582720875056}
+  - component: {fileID: 108448660210812696}
+  m_Layer: 8
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1746701534414868
 GameObject:
   m_ObjectHideFlags: 0
@@ -24,7 +40,6 @@ GameObject:
   - component: {fileID: 61739957714559018}
   - component: {fileID: 50130641645551762}
   - component: {fileID: 114471791323159198}
-  - component: {fileID: 108961481027785766}
   m_Layer: 8
   m_Name: BouncingSpell
   m_TagString: Spell
@@ -41,10 +56,24 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0.5735764, w: 0.8191521}
   m_LocalPosition: {x: -2.45, y: 2.53, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4283582720875056}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 70}
+--- !u!4 &4283582720875056
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1579560948563928}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4195234754459698}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &50130641645551762
 Rigidbody2D:
   serializedVersion: 4
@@ -108,16 +137,16 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!108 &108961481027785766
+--- !u!108 &108448660210812696
 Light:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1746701534414868}
+  m_GameObject: {fileID: 1579560948563928}
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 2
-  m_Color: {r: 0.27450982, g: 0.015686275, b: 0.14117648, a: 1}
+  m_Color: {r: 0.6132076, g: 0.054957267, b: 0.32562408, a: 1}
   m_Intensity: 1
   m_Range: 15
   m_SpotAngle: 30

@@ -206,7 +206,8 @@ public class Player : MovingObject {
 
     private void RemoveLife() {
         foreach (Transform child in transform) {
-            Destroy(child.gameObject);
+            if (child.gameObject.name == Heart.name)
+                Destroy(child.gameObject);
         }
     }
 
