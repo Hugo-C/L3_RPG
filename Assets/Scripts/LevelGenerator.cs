@@ -37,7 +37,7 @@ public class LevelGenerator : MonoBehaviour {
         sw.Start();
         LoadLevel();
         sw.Stop();
-        Debug.Log("level loaded in " + sw.ElapsedMilliseconds + " ms");
+        Debug.Log("level loaded in <b>" + sw.ElapsedMilliseconds + "</b> ms");
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class LevelGenerator : MonoBehaviour {
         OpenConnectors(connectors);
         Uncarve();  // remove dead ends
         OpenConnectorsRandom();
-        Debug.Log("map generated with seed : " + _rnd.Seed);
+        Debug.Log("map generated with seed : <color=darkblue><b>" + _rnd.Seed + "</b></color>");
     }
 
     /// <summary>

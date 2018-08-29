@@ -3,6 +3,8 @@ using System.Collections;
 
 public class MyCamera : MonoBehaviour {
 
+    public float Smoothing = 0.4f;
+    
     private GameObject _player;
     private Vector3 _offset;
 
@@ -10,14 +12,16 @@ public class MyCamera : MonoBehaviour {
     void Start() {
         _player = GameObject.Find("Player");
         _offset = new Vector3(0, 0, -10);
+        transform.position = _player.transform.position + _offset;
     }
 
     // LateUpdate is called after Update each frame
-    void LateUpdate() {
+    private void LateUpdate() {
         if (_player != null) {
-            transform.position = _player.transform.position + _offset;
+            //transform.position = Vector3.Lerp(transform.position, _player.transform.position + _offset, Smoothing);  // smooth transition (but appear laggy)
+            transform.position =_player.transform.position + _offset;
         } else {
-            Debug.LogWarning("camera can't find the player");  
+            Debug.LogWarning("camera can't find the player");
             _player = GameObject.Find("Player");
         }
     }

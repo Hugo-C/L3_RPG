@@ -17,10 +17,8 @@ public class Ennemy : MovingObject {
         _player = GameObject.Find("Player");
         _life = 2;
         _collidingTag = new List<string> { "Player", "BlockingBg" };
-        var animator = gameObject.GetComponent<Animator>();
-        MyRandom rnd = new MyRandom();
-        AnimatorStateInfo asi = animator.GetCurrentAnimatorStateInfo(0);
-        animator.Update(asi.length / (float)rnd.NextDouble());
+        InitAnimation();
+        InitSfx();
         base.Start();
 	}
 	
@@ -50,6 +48,26 @@ public class Ennemy : MovingObject {
         }
     }
 
+    private void InitAnimation() {
+        var animator = gameObject.GetComponent<Animator>();
+        MyRandom rnd = new MyRandom();
+        AnimatorStateInfo asi = animator.GetCurrentAnimatorStateInfo(0);
+        animator.Update(asi.length / (float)rnd.NextDouble());
+    }
+
+    /// <summary>
+    /// Init the sound effect of the ennemy in order to be desynchonised with the other ennemy
+    /// </summary>
+    private void InitSfx() {
+        var myAudioSource = gameObject.GetComponent<AudioSource>();
+        if (myAudioSource == null) {
+            Debug.LogWarning("no audio source attached to the ennemy");
+        } else {
+            MyRandom rnd = new MyRandom();
+            myAudioSource.time = (float)rnd.NextDouble() * myAudioSource.clip.length;
+            myAudioSource.Play();
+        }
+    }
 
     protected override void OnCantMove(GameObject go) {
         if(go != null && go.CompareTag("Player")) {

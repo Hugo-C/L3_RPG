@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MovingObject {
+public class Player : MovingObject, IPausable {
     private const float MoveCoef = 0.1f;
     private const float SpellCooldown = 0.5f;
     private const float SpiralSpellCooldown = 1f;
@@ -14,6 +14,7 @@ public class Player : MovingObject {
     private SpriteRenderer _spriteRenderer;
     private List<string> _collidingTag;  // tag the player can collide with
     private Text _coinCount;
+    private AudioSource _audioSourceFootsteps;
 
     public GameObject Spell;
     public GameObject Heart;
@@ -23,6 +24,8 @@ public class Player : MovingObject {
     private bool _spiralSpellOnCoolDown;
     private int _coins;
     private int _life;
+
+    private bool _gamePaused;
 
     public int Coins {
         get {
@@ -48,11 +51,13 @@ public class Player : MovingObject {
 
     // Use this for initialization
     protected override void Start () {
-        _animator = gameObject.GetComponent<Animator>();
-        _spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        _animator = GetComponent<Animator>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
         _collidingTag = new List<string> { "BlockingBg" };
         _coinCount = GameObject.Find("CoinCount").GetComponent<Text>();
+        _audioSourceFootsteps = GetComponent<AudioSource>();
         _spellOnCoolDown = false;
+        _gamePaused = false;
         LevelManager levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
         if (levelManager.LevelCompleted == 0) {
             Life = 3;
@@ -67,44 +72,61 @@ public class Player : MovingObject {
 	
 	// Update is called once per frame
 	void Update () {
+	    if (!_gamePaused) {
+	        float horizontal = Input.GetAxisRaw("Horizontal") * MoveCoef;
+	        float vertical = Input.GetAxisRaw("Vertical") * MoveCoef;
+	        if (horizontal != 0) {
+	            vertical = 0f; // the player can't move diagnoly (for now at least)
+	        }
 
-        float horizontal = Input.GetAxisRaw("Horizontal") * MoveCoef;
-        float vertical = Input.GetAxisRaw("Vertical") * MoveCoef;
-        if (horizontal != 0) {
-            vertical = 0;  // the player can't move diagnoly (for now at least)
-        }
-        HandleAnimation(horizontal, vertical);
-        if (horizontal != 0 || vertical != 0) {
-            AttemptMove(horizontal, vertical, _collidingTag);
-        }
+	        if (horizontal != 0 || vertical != 0) {
+	            AttemptMove(horizontal, vertical, _collidingTag);
+	            if (!_audioSourceFootsteps.isPlaying)
+	                _audioSourceFootsteps.Play();
+	        }
+	        else {
+	            if (_audioSourceFootsteps.isPlaying)
+	                _audioSourceFootsteps.Pause();
+	        }
 
-        float horizontalFire = Input.GetAxisRaw("HorizontalFire");
-        float verticalFire = Input.GetAxisRaw("VerticalFire");
-        if ((horizontalFire != 0 || verticalFire != 0) && !_spellOnCoolDown) {
-            StartCoroutine(CastSpell(horizontalFire, verticalFire, true));
-        }
+	        float horizontalFire = Input.GetAxisRaw("HorizontalFire");
+	        float verticalFire = Input.GetAxisRaw("VerticalFire");
+	        HandleAnimation(horizontal, vertical, horizontalFire);
+	        if ((horizontalFire != 0 || verticalFire != 0) && !_spellOnCoolDown) {
+	            StartCoroutine(CastSpell(horizontalFire, verticalFire, true));
+	        }
 
-        if (Input.GetKeyDown(KeyCode.Space) && !_spiralSpellOnCoolDown) {
-            StartCoroutine(CastSpiralSpell());
-        }
+	        if (Input.GetKeyDown(KeyCode.Space) && !_spiralSpellOnCoolDown) {
+	            StartCoroutine(CastSpiralSpell());
+	        }
 
-	    if (Input.GetKeyDown(KeyCode.E)) {  // Handle interraction
-	        var interractiveGameObjects = GameObject.FindGameObjectsWithTag("Interractive");
-	        Debug.Log("nb : " + interractiveGameObjects.Length);
-	        foreach (var go in interractiveGameObjects) {
-	            if (Vector3.Distance(go.transform.position, transform.position) < 5) {
-	                var interractiveGameObject = go.GetComponent(typeof(MonoBehaviour)) as IInterractiveGameObject;
-	                interractiveGameObject?.Interract();
+	        if (Input.GetKeyDown(KeyCode.E)) { // Handle interraction
+	            var interractiveGameObjects = GameObject.FindGameObjectsWithTag("Interractive");
+	            Debug.Log("nb : " + interractiveGameObjects.Length);
+	            foreach (var go in interractiveGameObjects) {
+	                if (Vector3.Distance(go.transform.position, transform.position) < 5) {
+	                    var interractiveGameObject = go.GetComponent(typeof(MonoBehaviour)) as IInterractiveGameObject;
+	                    interractiveGameObject?.Interract();
+	                }
 	            }
 	        }
 	    }
-    }
+	}
 
-    private void HandleAnimation(float horizontal, float vertical) {
+    private void HandleAnimation(float horizontal, float vertical, float horizontalFire) {
         if (vertical == 0 && horizontal == 0) {
             _animator.SetBool("walking", false);  // we don't have yet an idle animation
+            
+            // the player face the direction where he is firing
+            if (horizontalFire < 0) {
+                _spriteRenderer.flipX = true;
+            } else if (horizontalFire > 0) {
+                _spriteRenderer.flipX = false;
+            }
         } else {
             _animator.SetBool("walking", true);  // we don't have yet an idle animation
+            
+            // the player face the direction where he is going
             if (horizontal > 0) {
                 _spriteRenderer.flipX = false;
             } else if (horizontal < 0) {
@@ -199,6 +221,7 @@ public class Player : MovingObject {
         for(int i=0; i < lifeToDisplay; i++) {
             Vector3 shift = new Vector3(0.35f*i, 0f);
             GameObject go = Instantiate(Heart, original + shift , Quaternion.identity);
+            go.name = Heart.name;
             go.transform.position = original + shift;
             go.transform.SetParent(gameObject.transform);
         }
@@ -215,5 +238,13 @@ public class Player : MovingObject {
         Life = 3;
         Coins = 0;
         Save();
+    }
+
+    public void OnPauseGame() {
+        _gamePaused = true;
+    }
+
+    public void OnResumeGame() {
+        _gamePaused = false;
     }
 }

@@ -46,13 +46,6 @@ public class LevelManager : MonoBehaviour {
         _loading = false;
     }
 
-    // Update is called once per frame
-    void Update () {
-        if (Input.GetKey(KeyCode.Escape)){
-            Application.Quit();
-        }
-    }
-
     /// <summary>
     /// Load the specified scene 
     /// </summary>
@@ -69,6 +62,9 @@ public class LevelManager : MonoBehaviour {
             Cursor.visible = true;
         }
         SceneManager.LoadScene(scene);
+        GameObject myAudioManager = GameObject.Find("AudioManager");
+        myAudioManager.GetComponent<AudioManager>().LoadMusic(scene);
+        Time.timeScale = 1f;
     }
 
     public void LoadScene(string scene, int delay) {
@@ -89,6 +85,11 @@ public class LevelManager : MonoBehaviour {
             UiInstance = Instantiate(UI);
             DontDestroyOnLoad(UiInstance);
         }
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
     }
 
     // DEBUG

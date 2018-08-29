@@ -3,6 +3,15 @@
     <note priority="high" time="1523143099" done="1528213914">
         ajuster les hitbox des murs
     </note>
+    <note priority="high" time="1528323242" done="1533758568">
+        fixer les lumières (=&gt; doc Unity)
+        <note priority="medium" time="1528360095" done="0">
+            ajuster l'intensité pour qu'elle soit progressive (exemple : à la fin d'un sort)
+        </note>
+    </note>
+    <note priority="high" time="1529440172" done="1533758571">
+        arreter d'avoir que des methodes statics =&gt; utiliser map comme un attribut
+    </note>
     <note priority="medium" time="1528306010" done="1529436747">
         ajouter une porte à un mur d'une piece
     </note>
@@ -20,6 +29,12 @@
     </note>
     <note priority="medium" time="1531608285" done="1531826239">
         Ajouter un compteur de pieces
+    </note>
+    <note priority="medium" time="1533548124" done="1535550762">
+        ajuster les touches de contrôles affichés aux touches rentrées dans le keymap d'unity
+        <comment>
+            impossible en l'état
+        </comment>
     </note>
     <note priority="low" time="1521027495" done="1528214398">
         enlever les spells dupliqué de l'attaque en spiral
@@ -39,20 +54,23 @@
     <note priority="low" time="1529437749" done="1530659249">
         Ajouter aleatoirement des entrées aux salles ou entre les corridors
     </note>
-    <note priority="verylow" time="1523143063" done="1528215569">
+    <note priority="low" time="1533585699" done="1533635107">
+        Eviter que tous les ennemis commencent leurs animations au même moments
+        <comment>
+            utilisation de la méthode Animator.Update()
+        </comment>
+    </note>
+    <note priority="verylow" time="1523143063" done="1535550782">
         (re) supprimer les sorts qui partent trop loin
         <comment>
             ajout d'un if dans Update de Spell.cs
         </comment>
     </note>
-    <note priority="high" time="1528323242">
-        fixer les lumières (=&gt; doc Unity)
-        <note priority="medium" time="1528360095">
-            ajuster l'intensité pour qu'elle soit progressive (exemple : à la fin d'un sort)
-        </note>
+    <note priority="veryhigh" time="1533758605">
+        BUG : les coeurs ne disparaissent pas lorsque le joueur est touché
     </note>
-    <note priority="high" time="1529440172">
-        arreter d'avoir que des methodes statics =&gt; utiliser map comme un attribut
+    <note priority="high" time="1533758654">
+        Travailler sur MovingObject.cs =&gt; joueur bloqué lors des passages verticaux
     </note>
     <note priority="medium" time="1531826309">
         tests
@@ -62,15 +80,6 @@
     </note>
     <note priority="medium" time="1531826344">
         zone d'achat
-    </note>
-    <note priority="medium" time="1533548124">
-        ajuster les touches de contrôles affichés aux touches rentrées dans le keymap d'unity
-    </note>
-    <note priority="low" time="1533585699" done="1533635107">
-        Eviter que tous les ennemis commencent leurs animations au même moments
-        <comment>
-            utilisation de la méthode Animator.Update()
-        </comment>
     </note>
     <note priority="verylow" time="1529441393">
         GameIdea : pouvoir voir les autres joueurs (en phantom à la marioKart) =&gt; indique les pieges, ... autre ? :/

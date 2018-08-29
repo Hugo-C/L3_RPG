@@ -184,6 +184,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d49d11d8110b4f41b3483fb7b8e5056, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DisabledSprite: {fileID: 21300186, guid: 1f4b65b5ea172da4080ccb6e5c621680, type: 3}
 --- !u!212 &212886980136371938
 SpriteRenderer:
   m_ObjectHideFlags: 1
