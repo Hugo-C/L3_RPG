@@ -13,8 +13,10 @@ public class Exit : MonoBehaviour {
 
             // TODO smooth transition from player
             GameObject dirLight = GameObject.Find("Directional Light");
-            Light lightComponent = dirLight.GetComponent<Light>();
-            lightComponent.intensity = 0.5f;
+            if (dirLight != null) {
+                Light lightComponent = dirLight.GetComponent<Light>();
+                lightComponent.intensity = 0.5f;
+            }
             GameObject player = GameObject.Find("Player");
             player.GetComponent<Player>().Save();
             player.SetActive(false);

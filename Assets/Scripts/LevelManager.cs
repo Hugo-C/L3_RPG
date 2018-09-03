@@ -43,6 +43,8 @@ public class LevelManager : MonoBehaviour {
             _levelCompletedCount = GameObject.Find("LevelCount").GetComponent<Text>();
             LevelCompleted = 0;
         }
+
+        Application.targetFrameRate = 90;
         _loading = false;
     }
 

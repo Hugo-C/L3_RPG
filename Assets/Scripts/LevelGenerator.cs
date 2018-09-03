@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LevelGenerator : MonoBehaviour {
 
@@ -31,8 +32,15 @@ public class LevelGenerator : MonoBehaviour {
     private Tile[,] _map;
     private MyRandom _rnd;
 
+    [SerializeField]
+    private int _startSeed;  // if 0 not considered
+
     private void Awake() {
-        _rnd = new MyRandom();
+        if (_startSeed == 0) {
+            _rnd = new MyRandom();
+        } else {
+            _rnd = new MyRandom(_startSeed);
+        }
         var sw = new System.Diagnostics.Stopwatch();
         sw.Start();
         LoadLevel();
@@ -536,6 +544,7 @@ public class LevelGenerator : MonoBehaviour {
                 sprite = WallSprites[9];
                 break;
             case 216: //0B011011000
+            case 472: //0B111011000
                 sprite = WallSprites[10];
                 break;
             case 504: //0B111111000

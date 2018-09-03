@@ -46,6 +46,9 @@ public class HeartDispenser : MonoBehaviour, IInterractiveGameObject {
 			var lightComponent = transform.GetComponentInChildren<Light>();
 			lightComponent.enabled = false;
 			gameObject.GetComponent<SpriteRenderer>().sprite = DisabledSprite;
+			var PSmain = gameObject.GetComponent<ParticleSystem>().main;
+			PSmain.loop = false;
+			
 			_ready = false;
 			_uiNotification.enabled = false;
 		}
