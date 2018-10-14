@@ -8,8 +8,8 @@ public class SimpleSpell : Spell {
         CantMove = true;
         if (go != null) {
             if (go.CompareTag("Ennemy")) {
-                Ennemy ennemy = go.GetComponent<Ennemy>();
-                ennemy.Hit();
+                Enemy enemy = go.GetComponent<Enemy>();
+                enemy.Hit();
             } else if (go.CompareTag("BlockingBg")) {
                 Vector3 v = new Vector3(0f, 0f, gameObject.transform.eulerAngles.z + 180f);
                 Instantiate(BouncingSpell, gameObject.transform.position, Quaternion.Euler(v));

@@ -22,7 +22,7 @@ public class BouncingSpell : Spell {
         CantMove = true;
         if (go != null) {
             if (go.CompareTag("Ennemy")) {
-                go.GetComponent<Ennemy>().Hit();
+                go.GetComponent<Enemy>().Hit();
             } else if (go.CompareTag("Player")) {
                 go.GetComponent<Player>().Hit();
             }

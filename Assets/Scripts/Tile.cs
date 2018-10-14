@@ -82,4 +82,8 @@ public class Tile {
                 t2._rank++;
         }
     }
+
+    public override string ToString() {
+        return "Tile@" + X + ", " + Y;
+    }
 }

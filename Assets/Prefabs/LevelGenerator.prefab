@@ -98,5 +98,8 @@ MonoBehaviour:
     type: 2}
   EnemyPrefab: {fileID: 1497416077000598, guid: 47ee2485f1c935c47af42b8a45982edd,
     type: 2}
+  SmartEnemyPrefab: {fileID: 1606928745016878, guid: 8c709c8670dafe743902c30ed21fc54f,
+    type: 2}
   HeartDispenser: {fileID: 1167504046434544, guid: 5203036d258513740abcb25369edc4c3,
     type: 2}
+  _startSeed: 0

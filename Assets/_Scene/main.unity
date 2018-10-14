@@ -426,6 +426,12 @@ Prefab:
       propertyPath: _startSeed
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114129527739010570, guid: 6b4b3ad7080eaf94d93e50fdebf227b6,
+        type: 2}
+      propertyPath: EnemyPrefab
+      value: 
+      objectReference: {fileID: 1497416077000598, guid: 47ee2485f1c935c47af42b8a45982edd,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6b4b3ad7080eaf94d93e50fdebf227b6, type: 2}
   m_IsPrefabAsset: 0
