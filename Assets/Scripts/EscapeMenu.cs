@@ -7,10 +7,11 @@ public class EscapeMenu : MonoBehaviour {
     public GameObject menu;
     public GameObject option;
 	
-    private bool paused = false;
+    private bool _paused = false;
+    private AudioSource _click;
 
-    private void Start()
-    {
+    private void Start() {
+        _click = GetComponent<AudioSource>();
         Close();
     }
 
@@ -18,7 +19,7 @@ public class EscapeMenu : MonoBehaviour {
     void Update () {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (!paused)
+            if (!_paused)
             {
                 Pause();
             } else
@@ -30,7 +31,7 @@ public class EscapeMenu : MonoBehaviour {
 
     void Pause()
     {
-        paused = true;
+        _paused = true;
         DisplayMenu();
         Cursor.visible = true;
         Time.timeScale = 0f;
@@ -50,7 +51,7 @@ public class EscapeMenu : MonoBehaviour {
 	
     public void Resume()
     {
-        paused = false;
+        _paused = false;
         Close();
         Cursor.visible = false;
         Time.timeScale = 1f;
@@ -70,18 +71,21 @@ public class EscapeMenu : MonoBehaviour {
 
     public void DisplayMenu()
     {
+        _click.Play();
         menu.SetActive(true);
         option.SetActive(false);
     }
 
     public void DisplayOption()
     {
+        _click.Play();
         menu.SetActive(false);
         option.SetActive(true);
     }
 
     public void Close()
     {
+        _click.Play();
         menu.SetActive(false);
         option.SetActive(false);
     }
