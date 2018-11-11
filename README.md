@@ -4,7 +4,7 @@
 * Procedural map generation using mazes and union-find structure
 * Pathfinding using A* algorithm and priority queues
 
-## GIF
+## GIF (WIP)
 ![](Gif/proceduralMap.gif)
 ![](Gif/nav.gif)
 
